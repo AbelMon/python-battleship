@@ -4,20 +4,21 @@ import os
 import time
 import random
 
-BOARDCOMP = []
-USERBOARD = []
+BOARDCOMP = [] #This list stores the data of the computer board.
+USERBOARD = [] #This list stores the data of the user board.
+
 SHIPS = {"aircraft": 5, "battleship": 4, "frigate": 3, "submarine": 3, "minesweeper": 2}
 CHARACTER = {"aircraft": "| A ", "battleship": "| B ", "frigate": "| F ", "submarine": "| S ", "minesweeper": "| M "}
 
 def create(board):
-    """This function adds several lists at the BOARDCOMP list, this will serve to place the boats later."""
+    """This function adds several lists at the board list, this will serve to place the boats later."""
     for var in range(0, 10):
         board.append(["|   "] * 10),
     print_tablero(board)
 
 
 def print_tablero(board):
-    """Prints BOARDCOMP list to be displayed as a game board on the screen."""
+    """Prints board list to be displayed as a game board on the screen."""
     print ""
     print "      1   2   3   4   5   6   7   8   9  10"
     print "    -----------------------------------------"
@@ -29,56 +30,132 @@ def print_tablero(board):
             print fila + 1,"", "".join(elemento) + "|"
             print "    -----------------------------------------" 
 
+
 def user_decision():
+    """This function allows the user to decide the position of their ships."""
     create(USERBOARD)
-    booleanvar = False
     for boat in SHIPS:
-        if boat == "aircraft":
-            print "  >Place an %s. It measures %d squares." %(boat, SHIPS[boat])
-        else:
-            print "  >Place a %s. It measures %d squares." %(boat, SHIPS[boat])
+        condicion = False
+        while condicion == False: #This allows repeat the cycle every time an error is returned.
+            if boat == "aircraft":
+                print ">- Place an " + chr(27) + "[3;96m" + boat + chr(27) + "[0m", "it measures", chr(27) + "[3;96m"+ str(SHIPS[boat]) + " squares." + chr(27) + "[0m"
+            else:
+                print ">- Place a " + chr(27) + "[3;96m" + boat + chr(27) + "[0m", "it measures", chr(27) + "[3;96m"+ str(SHIPS[boat]) + " squares." + chr(27) + "[0m"
+            placerow = entering_number_row()
+            placecol = entering_number_col()
+            position = user_vertical_horizontal()
+            if position == "h":
+                there_are_boat = no_intersection_horizontal(USERBOARD,SHIPS, boat, placerow, placecol)
+                if there_are_boat != False:
+                    placing_ship_horizon(placerow, placecol, boat)
+                    clear()
+                    print_tablero(USERBOARD)
+                    condicion = True
+            elif position == "v":
+                boat_in_vertical = no_exist_vertical(USERBOARD, SHIPS, boat, placerow, placecol)
+                if boat_in_vertical != False:
+                    placing_ship_vertical(placerow, placecol, boat)
+                    clear()
+                    print_tablero(USERBOARD)
+                    condicion = True
+
+
+def no_intersection_horizontal(board,dict_ship, boat, row_x, col_y):
+    """This function checks that the boats are not placed on other boats."""
+    count = 0 #This variable stores the count of the string "|   ".
+
+    try:
+        for number in range(dict_ship[boat]):
+            if "|   " in board[row_x][col_y + number]:
+                count += 1 #When a string "|   " is found, adds 1 to the variable count.
+    except: #If an error occurs, an error message is displayed and returns False.
         print ""
-        placerow = entering_number_row()
-        placecol = entering_number_col()
-        position = user_vertical_horizontal()
-        if position == "h":
-            for horizont in range(SHIPS[boat]):
-                USERBOARD[placerow - 1][(placecol - 1) + horizont] = CHARACTER[boat]
-            print_tablero(USERBOARD)
-        elif position == "v":
-            for vertical in range(SHIPS[boat]):
-                USERBOARD[(placerow - 1) + vertical][placecol - 1] = CHARACTER[boat]
-            print_tablero(USERBOARD)
+        print chr(27) + "[0;91m" + "    ⚠ You can not put the boat in this position. It is off the board." + chr(27) + "[0m"
+        print ""
+        return False
+
+    if count == dict_ship[boat]: #If the value of "boat" and the value of "count" match, returns True
+        return True
+    else: #If the values are different, returns False.
+        print ""
+        print chr(27) + "[0;91m" + "    ✘ In this position already exists a boat. Try again." + chr(27) + "[0m"
+        print ""
+        return False 
+
+def no_exist_vertical(board, dict_ship, boat, row_x, col_y):
+    """This function checks that the boats are not placed on other boats in vertical position."""
+    count = 0 #This variable stores the count of the string "|   ".
+
+    try:
+        for number in range(dict_ship[boat]):
+            if "|   " in board[row_x + number][col_y]:
+                count += 1 #When a string "|   " is found, adds 1 to the variable count.
+    except: #If an error occurs, an error message is displayed and returns False.
+        print ""
+        print chr(27) + "[0;91m" + "    ⚠ You can not put the boat in this position. It is off the board." + chr(27) + "[0m"
+        print ""
+        return False
+
+    if count == dict_ship[boat]: #If the value of "boat" and the value of "count" match, returns True
+        return True
+    else: #If the values are different, returns False.
+        print ""
+        print chr(27) + "[0;91m" + "    ✘ In this position already exists a boat. Try again." + chr(27) + "[0m"
+        print ""
+        return False 
+
+
+
+def placing_ship_horizon(coordx, coordy, boat):
+    try:
+        for intento in range(SHIPS[boat]):
+            USERBOARD[coordx][coordy + intento] = CHARACTER[boat]
+    except:
+        try:
+            for intento in range(SHIPS[boat]):
+                USERBOARD[coordx][coordy + intento] = "|   "
+        except:
+            print ""
+            print "You can not put the boat in this position. It is off the board."
+            return False
 
 
 def placing_ship_vertical(coordx, coordy, boat):
-    pass
-
+    try:
+        for intento in range(SHIPS[boat]):
+            USERBOARD[coordx + intento][coordy] = CHARACTER[boat]
+    except:
+        try:
+            for intento in range(SHIPS[boat]):
+                USERBOARD[coordx + intento ][coordy] = "|   "
+        except:
+            print ""
+            print chr(27) + "[0;91m" + "    ⚠ You can not put the boat in this position. It is off the board." + chr(27) + "[0m"
+            print ""
+            return False
 
 
 def user_vertical_horizontal():
-    print ""
-    print "Select the position of your boat."
-    print "Press 'v' to place boat vertically."
-    print "Press 'h' to place the boat horizontally."
+    message_text = chr(27) + "[0;95m" + """
+   //*Select the position of your boat.
+   //*Press 'v' to place boat vertically.
+   //*Press 'h' to place the boat horizontally.""" + chr(27) + "[0m"
+    print message_text
+
     while True:
         print ""
         decisionuser = raw_input("   >* v/h: ")
         decision_low = decisionuser.lower()
         if decision_low == "h":
-            print "horizontal"
             return "h"
             break
         elif decision_low == "v":
-            print "vertical"
             return "v"
             break
         else:
             print ""
-            print chr(27) + "[0;91m" + "   Invalid data!." + chr(27) + "[0m"
-            print ""
-            print "Press 'v' to place boat vertically."
-            print "Press 'h' to place the boat horizontally."
+            print chr(27) + "[0;91m" + "              ✘ Invalid data!." + chr(27) + "[0m"
+            print message_text
 
 def random_row(board):
     """This function generates a random number to locate the row number on the game board."""
@@ -89,22 +166,6 @@ def random_row(board):
 def random_col(board):
     """This function generates a random number to locate the column number on the game board."""
     return random.randint(1, len(board[0]))
-
-
-def check_dictionary(dictionary):
-    cycle = 0
-    found = 0
-    nomatch = 0
-    while cycle != 10:
-        for x in range(10):
-            if "| X " in dictionary[cycle][x]:
-                found += 1
-            else:
-                nomatch += 1
-        cycle += 1
-    print found
-    print nomatch
-
 
 
 def more_ships():
@@ -202,14 +263,15 @@ def entering_number_row():
             print ""
             guessrow = int(raw_input("   >Enter row: "))
             if guessrow >= 1 and guessrow <= 10:
+                guessrow -= 1
                 return guessrow
                 break
             else:
                 print ""
-                print "Please enter numbers in the range of 1 - 10"
+                print chr(27) + "[0;91m" + "     ✘ Please enter numbers in the range of 1 - 10." + chr(27) + "[0m"
         except:
             print ""
-            print "Please enter numbers!"
+            print chr(27) + "[0;91m" + "     ✘ Please enter numbers!" + chr(27) + "[0m"
 
 
 
@@ -220,14 +282,15 @@ def entering_number_col():
             print ""
             guesscol = int(raw_input("   >Enter column: "))
             if guesscol >= 1 and guesscol <=10:
+                guesscol -= 1
                 return guesscol
                 break
             else:
                 print ""
-                print "Please enter numbers in the range of 1 - 10"
+                print chr(27) + "[0;91m" + "     ✘ Please enter numbers in the range of 1 - 10." + chr(27) + "[0m"
         except:
             print ""
-            print "Please enter numbers!"
+            print chr(27) + "[0;91m" + "     ✘ Please enter numbers!" + chr(27) + "[0m"
 
 
 
@@ -286,6 +349,7 @@ def menu():
     while True:
         decision = raw_input(   ">* Choose an option: ")
         if decision == "1":
+            clear()
             user_decision()
             break
         elif decision == "2":
@@ -299,7 +363,7 @@ def menu():
             break
         else:
             print ""
-            print chr(27) + "[0;91m" + "   Please enter NUMBERS from 1 to 4." + chr(27) + "[0m"
+            print chr(27) + "[0;91m" + "   ✘ Please enter NUMBERS from 1 to 4." + chr(27) + "[0m"
             print ""
 
 
