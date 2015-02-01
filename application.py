@@ -8,6 +8,7 @@ import copy
 BOARDCOMP = [] #This list stores the data of the computer board.
 USERBOARD = [] #This list stores the data of the user board.
 VERSUSBOARD = []
+COMPUTER_INSULTS = ["Hahaha. You like that?", "I will destroy you.", "That had to hurt", "Boom!", "Burn, baby!", "Squeal boy, squeal!", "Toasted!", "Die human!"]
 
 
 SHIPS = {"aircraft": 5, "battleship": 4, "frigate": 3, "submarine": 3, "minesweeper": 2}
@@ -203,85 +204,6 @@ def computer_ships():
                     condicion = True
 
 
-
-def main():
-    row = random_row(BOARDCOMP)
-    col = random_col(BOARDCOMP)
-    print row
-    print col
-    userrow = entering_number_row()
-    usercol = entering_number_col()
-    print userrow
-    print ">>>"
-    print type(userrow)
-    if userrow == row and usercol == col:
-        print "Well done!"
-    else:
-        BOARDCOMP[userrow - 1][usercol - 1] = "| X "
-        print_tablero(BOARDCOMP)
-
-
-
-def game_alone():
-    create(VERSUSBOARD)
-    print_tablero(VERSUSBOARD)
-    for turno in range(4):
-        adivina_row = entering_number_row()
-        adivina_col = entering_number_col()
-        hit_boat(BOARDCOMP, VERSUSBOARD, adivina_row, adivina_col)
-
-
-def computer_turn():
-    print_tablero(USERBOARD)
-    hitrow = random_row()
-    hitcol = random_col()
-    pass
-
-def hit_boat(hiden_board, board, hitrow, hitcol):
-    if "|   " in hiden_board[hitrow][hitcol]:
-        hiden_board[hitrow][hitcol] = "| o "
-        board[hitrow][hitcol] = "| o "
-        print_tablero(hiden_board)
-        print_tablero(board)
-        print "You failed"
-        return False
-    else:
-        if "| o " in hiden_board[hitrow][hitcol]:
-            print "You've already shot that position. Try again."
-            return True
-        elif "| x " in hiden_board[hitrow][hitcol]:
-            print "You've already shot that position. Try again."
-            return True
-        else:
-            hiden_board[hitrow][hitcol] = "| x "
-            board[hitrow][hitcol] = "| x "
-            print_tablero(board)
-            print_tablero(hiden_board)
-            return True
-
-
-
-def mainvarios(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5):
-    BOARDCOMP[x1 - 1][y1 - 1] = "| 1 "
-    BOARDCOMP[x2 - 1][y2 - 1] = "| 2 "
-    BOARDCOMP[x3 - 1][y3 - 1] = "| 3 "
-    BOARDCOMP[x4 - 1][y4 - 1] = "| 4 "
-    BOARDCOMP[x5 - 1][y5 - 1] = "| 5 "
-    print_tablero(BOARDCOMP)
-    for turno in range(4):
-        guessx = entering_number_row()
-        guessy = entering_number_col()
-        if (guessx == x1 and guessy == y1) or (guessx == x2 and guessy == y2) or (guessx == x3 and guessy == y3) or (guessx == x4 and guessy == y4) or (guessx == x5 and guessy == y5):
-            print "Bien"
-            BOARDCOMP[guessx - 1][guessy - 1] = "| X "
-            print_tablero(BOARDCOMP)
-        else:
-            print "No adivinas"
-            BOARDCOMP[guessx - 1][guessy - 1] = "| X "
-            print_tablero(BOARDCOMP)
-
-
-
 def entering_number_row():
     """Allows the user to guess the row number where a boat can be placed."""
     while True:
@@ -318,6 +240,136 @@ def entering_number_col():
             print ""
             print chr(27) + "[0;91m" + "     ✘ Please enter numbers!" + chr(27) + "[0m"
 
+def main():
+    row = random_row(BOARDCOMP)
+    col = random_col(BOARDCOMP)
+    print row
+    print col
+    userrow = entering_number_row()
+    usercol = entering_number_col()
+    print userrow
+    print ">>>"
+    print type(userrow)
+    if userrow == row and usercol == col:
+        print "Well done!"
+    else:
+        BOARDCOMP[userrow - 1][usercol - 1] = "| X "
+        print_tablero(BOARDCOMP)
+
+
+
+def game_alone():
+    print_tablero(VERSUSBOARD)
+    adivina_row = entering_number_row()
+    adivina_col = entering_number_col()
+    clear()
+    view_board = hit_boat(BOARDCOMP, VERSUSBOARD, adivina_row, adivina_col)
+    return view_board
+
+
+def computer_turn():
+    hitrow = random_row(USERBOARD)
+    hitcol = random_col(USERBOARD)
+    view_board = hit_boat_computer(USERBOARD, hitrow, hitcol)
+    return view_board
+
+
+def hit_boat_computer(board, hitrow, hitcol):
+    if "|   " in board[hitrow][hitcol]:
+        board[hitrow][hitcol] = "| o "
+        print_tablero(board)
+        print "The enemy has failed."
+        print "Now it's your turn."
+        raw_input("Press enter...")
+        return True
+    else:
+        if "| o " in board[hitrow][hitcol]:
+            return False
+        elif "| x " in board[hitrow][hitcol]:
+            return False
+        else:
+            board[hitrow][hitcol] = "| x "
+            print_tablero(board)
+            print ""
+            print "Enemy message: " + random.choice(COMPUTER_INSULTS)
+            print ""
+            print "The enemy has impacted your boat."
+            print "The enemy has a new attempt."
+            raw_input("Press enter...")
+            return False
+
+
+
+def turnos():
+    create(VERSUSBOARD)
+    turn = True
+    while True:
+        while turn == True:
+            clear()
+            print "   Your turn"
+            turn = game_alone()
+        else:
+            clear()
+            print "   Computer"
+            turn = computer_turn()
+
+
+
+def hit_boat(hiden_board, board, hitrow, hitcol):
+    if "|   " in hiden_board[hitrow][hitcol]:
+        hiden_board[hitrow][hitcol] = "| o "
+        board[hitrow][hitcol] = "| o "
+        clear()
+        print_tablero(hiden_board)
+        print "You failed"
+        print "It is turn of the enemy."
+        raw_input("Press enter...")
+        return False
+    else:
+        if "| o " in hiden_board[hitrow][hitcol]:
+            print_tablero(board)
+            print ""
+            print "You've already shot that position. Try again."
+            raw_input("Press enter and try again...")
+            return True
+        elif "| x " in hiden_board[hitrow][hitcol]:
+            print_tablero(board)
+            print ""
+            print "You've already shot that position. Try again."
+            raw_input("Press enter and try again...")
+            return True
+        else:
+            hiden_board[hitrow][hitcol] = "| x "
+            board[hitrow][hitcol] = "| x "
+            print_tablero(board)
+            print ""
+            print "You've hit the enemy ship!"
+            print "Yuo got another turn."
+            raw_input("Press enter...")
+            return True
+
+
+
+def mainvarios(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5):
+    BOARDCOMP[x1 - 1][y1 - 1] = "| 1 "
+    BOARDCOMP[x2 - 1][y2 - 1] = "| 2 "
+    BOARDCOMP[x3 - 1][y3 - 1] = "| 3 "
+    BOARDCOMP[x4 - 1][y4 - 1] = "| 4 "
+    BOARDCOMP[x5 - 1][y5 - 1] = "| 5 "
+    print_tablero(BOARDCOMP)
+    for turno in range(4):
+        guessx = entering_number_row()
+        guessy = entering_number_col()
+        if (guessx == x1 and guessy == y1) or (guessx == x2 and guessy == y2) or (guessx == x3 and guessy == y3) or (guessx == x4 and guessy == y4) or (guessx == x5 and guessy == y5):
+            print "Bien"
+            BOARDCOMP[guessx - 1][guessy - 1] = "| X "
+            print_tablero(BOARDCOMP)
+        else:
+            print "No adivinas"
+            BOARDCOMP[guessx - 1][guessy - 1] = "| X "
+            print_tablero(BOARDCOMP)
+
+
 
 def single_secion():
     print """
@@ -340,7 +392,7 @@ def single_secion():
     clear()
     atacar_image()
     time.sleep(2)
-    game_alone()
+    turnos()
     pass
 
 
