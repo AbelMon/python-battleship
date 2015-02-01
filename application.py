@@ -3,18 +3,23 @@
 import os
 import time
 import random
+import copy
 
 BOARDCOMP = [] #This list stores the data of the computer board.
 USERBOARD = [] #This list stores the data of the user board.
+VERSUSBOARD = []
+
 
 SHIPS = {"aircraft": 5, "battleship": 4, "frigate": 3, "submarine": 3, "minesweeper": 2}
 CHARACTER = {"aircraft": "| A ", "battleship": "| B ", "frigate": "| F ", "submarine": "| S ", "minesweeper": "| M "}
+
+
 
 def create(board):
     """This function adds several lists at the board list, this will serve to place the boats later."""
     for var in range(0, 10):
         board.append(["|   "] * 10),
-    print_tablero(board)
+
 
 
 def print_tablero(board):
@@ -31,9 +36,21 @@ def print_tablero(board):
             print "    -----------------------------------------" 
 
 
+def random_row(board):
+    """This function generates a random number to locate the row number on the game board."""
+    return random.randint(0, len(board) - 1)
+
+
+
+def random_col(board):
+    """This function generates a random number to locate the column number on the game board."""
+    return random.randint(0, len(board[0]) - 1)
+
+
 def user_decision():
     """This function allows the user to decide the position of their ships."""
     create(USERBOARD)
+    print_tablero(USERBOARD)
     for boat in SHIPS:
         condicion = False
         while condicion == False: #This allows repeat the cycle every time an error is returned.
@@ -47,17 +64,18 @@ def user_decision():
             if position == "h":
                 there_are_boat = no_intersection_horizontal(USERBOARD,SHIPS, boat, placerow, placecol)
                 if there_are_boat != False:
-                    placing_ship_horizon(placerow, placecol, boat)
+                    placing_ship_horizon(USERBOARD,placerow, placecol, boat)
                     clear()
                     print_tablero(USERBOARD)
                     condicion = True
             elif position == "v":
                 boat_in_vertical = no_exist_vertical(USERBOARD, SHIPS, boat, placerow, placecol)
                 if boat_in_vertical != False:
-                    placing_ship_vertical(placerow, placecol, boat)
+                    placing_ship_vertical(USERBOARD, placerow, placecol, boat)
                     clear()
                     print_tablero(USERBOARD)
                     condicion = True
+
 
 
 def no_intersection_horizontal(board,dict_ship, boat, row_x, col_y):
@@ -81,6 +99,8 @@ def no_intersection_horizontal(board,dict_ship, boat, row_x, col_y):
         print chr(27) + "[0;91m" + "    ✘ In this position already exists a boat. Try again." + chr(27) + "[0m"
         print ""
         return False 
+
+
 
 def no_exist_vertical(board, dict_ship, boat, row_x, col_y):
     """This function checks that the boats are not placed on other boats in vertical position."""
@@ -106,33 +126,36 @@ def no_exist_vertical(board, dict_ship, boat, row_x, col_y):
 
 
 
-def placing_ship_horizon(coordx, coordy, boat):
+def placing_ship_horizon(board, coordx, coordy, boat):
     try:
         for intento in range(SHIPS[boat]):
-            USERBOARD[coordx][coordy + intento] = CHARACTER[boat]
+            board[coordx][coordy + intento] = CHARACTER[boat]
     except:
         try:
             for intento in range(SHIPS[boat]):
-                USERBOARD[coordx][coordy + intento] = "|   "
+                board[coordx][coordy + intento] = "|   "
         except:
             print ""
             print "You can not put the boat in this position. It is off the board."
             return False
 
 
-def placing_ship_vertical(coordx, coordy, boat):
+
+
+def placing_ship_vertical(board, coordx, coordy, boat):
     try:
         for intento in range(SHIPS[boat]):
-            USERBOARD[coordx + intento][coordy] = CHARACTER[boat]
+            board[coordx + intento][coordy] = CHARACTER[boat]
     except:
         try:
             for intento in range(SHIPS[boat]):
-                USERBOARD[coordx + intento ][coordy] = "|   "
+                board[coordx + intento ][coordy] = "|   "
         except:
             print ""
             print chr(27) + "[0;91m" + "    ⚠ You can not put the boat in this position. It is off the board." + chr(27) + "[0m"
             print ""
             return False
+
 
 
 def user_vertical_horizontal():
@@ -157,64 +180,28 @@ def user_vertical_horizontal():
             print chr(27) + "[0;91m" + "              ✘ Invalid data!." + chr(27) + "[0m"
             print message_text
 
-def random_row(board):
-    """This function generates a random number to locate the row number on the game board."""
-    return random.randint(1, len(board))
 
 
+def computer_ships():
+    create(BOARDCOMP)
+    for boat in SHIPS:
+        condicion = False
+        while condicion == False:
+            position = ["v", "h"]
+            numb_x = random_row(BOARDCOMP)
+            numb_y = random_col(BOARDCOMP)
+            positionchoice = random.choice(position)
+            if positionchoice == "h":
+                no_boat = no_intersection_horizontal(BOARDCOMP, SHIPS, boat, numb_x, numb_y)
+                if no_boat != False:
+                    placing_ship_horizon(BOARDCOMP, numb_x, numb_y, boat)
+                    condicion = True
+            elif positionchoice == "v":
+                no_boat_vertical = no_exist_vertical(BOARDCOMP, SHIPS, boat, numb_x, numb_y)
+                if no_boat_vertical != False:
+                    placing_ship_vertical(BOARDCOMP, numb_x, numb_y, boat)
+                    condicion = True
 
-def random_col(board):
-    """This function generates a random number to locate the column number on the game board."""
-    return random.randint(1, len(board[0]))
-
-
-def more_ships():
-    """This function creates random coordinates to position five ships."""
-    position = ["v", "h"]
-    verthorizon = random.choice(position)
-    numb_x1 = random_row(BOARDCOMP)
-    numb_y1 = random_col(BOARDCOMP)
-    numb_x2 = random_row(BOARDCOMP)
-    numb_y2 = random_col(BOARDCOMP)
-    numb_x3 = random_row(BOARDCOMP)
-    numb_y3 = random_col(BOARDCOMP)
-    numb_x4 = random_row(BOARDCOMP)
-    numb_y4 = random_col(BOARDCOMP)
-    numb_x5 = random_row(BOARDCOMP)
-    numb_y5 = random_col(BOARDCOMP)
-
-
-    while (numb_x1 == numb_x2 and numb_y1 == numb_y2) or (numb_x1 == numb_x3 and numb_y1 == numb_y3) or (numb_x1 == numb_x4 and numb_y1 == numb_y4) or (numb_x1 == numb_x5 and numb_y1 == numb_y5) or (numb_x2 == numb_x3 and numb_y2 == numb_y3) or (numb_x2 == numb_x4 and numb_y2 == numb_y4) or (numb_x2 == numb_x5 and numb_y2 == numb_y5) or (numb_x3 == numb_x4 and numb_y3 == numb_y4) or (numb_x3 == numb_x5 and numb_y3 == numb_y5) or (numb_x4 == numb_x5 and numb_y4 == numb_y5):
-        numb_x1 = random_row(BOARDCOMP) #If the coordinates are identical, new coordinates
-        numb_y1 = random_col(BOARDCOMP) # are generated until no matches are found.
-        numb_x2 = random_row(BOARDCOMP)
-        numb_y2 = random_col(BOARDCOMP)
-        numb_x3 = random_row(BOARDCOMP)
-        numb_y3 = random_col(BOARDCOMP)
-        numb_x4 = random_row(BOARDCOMP)
-        numb_y4 = random_col(BOARDCOMP)
-        numb_x5 = random_row(BOARDCOMP)
-        numb_y5 = random_col(BOARDCOMP)
-
-
-    print "   ---1-----"
-    print "x1 ", numb_x1
-    print "y1 ", numb_y1
-    print "   ---2-----"
-    print "x2 ", numb_x2
-    print "y2 ", numb_y2
-    print "   ---3-----"
-    print "x3 ", numb_x3
-    print "y3 ", numb_y3
-    print "   ---4-----"
-    print "x4 ", numb_x4
-    print "y4 ", numb_y4
-    print "   ---5-----"
-    print "x5 ", numb_x5
-    print "y5 ", numb_y5
-    print verthorizon
-
-    mainvarios(numb_x1, numb_y1, numb_x2, numb_y2, numb_x3, numb_y3, numb_x4, numb_y4, numb_x5, numb_y5)
 
 
 def main():
@@ -232,6 +219,45 @@ def main():
     else:
         BOARDCOMP[userrow - 1][usercol - 1] = "| X "
         print_tablero(BOARDCOMP)
+
+
+
+def game_alone():
+    create(VERSUSBOARD)
+    print_tablero(VERSUSBOARD)
+    for turno in range(4):
+        adivina_row = entering_number_row()
+        adivina_col = entering_number_col()
+        hit_boat(BOARDCOMP, VERSUSBOARD, adivina_row, adivina_col)
+
+
+def computer_turn():
+    print_tablero(USERBOARD)
+    hitrow = random_row()
+    hitcol = random_col()
+    pass
+
+def hit_boat(hiden_board, board, hitrow, hitcol):
+    if "|   " in hiden_board[hitrow][hitcol]:
+        hiden_board[hitrow][hitcol] = "| o "
+        board[hitrow][hitcol] = "| o "
+        print_tablero(hiden_board)
+        print_tablero(board)
+        print "You failed"
+        return False
+    else:
+        if "| o " in hiden_board[hitrow][hitcol]:
+            print "You've already shot that position. Try again."
+            return True
+        elif "| x " in hiden_board[hitrow][hitcol]:
+            print "You've already shot that position. Try again."
+            return True
+        else:
+            hiden_board[hitrow][hitcol] = "| x "
+            board[hitrow][hitcol] = "| x "
+            print_tablero(board)
+            print_tablero(hiden_board)
+            return True
 
 
 
@@ -293,6 +319,30 @@ def entering_number_col():
             print chr(27) + "[0;91m" + "     ✘ Please enter numbers!" + chr(27) + "[0m"
 
 
+def single_secion():
+    print """
+             
+             
+             
+    """
+    raw_input("         Press enter to continue...")
+    clear()
+    print ""
+    print "     It's time to deploy your ships."
+    print "     Enter the coordinates."
+    user_decision()
+    print ""
+    print "         All ships in position."
+    print ""
+    raw_input("         Press enter to continue...")
+    clear()
+    computer_ships()
+    clear()
+    atacar_image()
+    time.sleep(2)
+    game_alone()
+    pass
+
 
 def first():
     """This is a function that displays the name of the game and the menu instructions"""
@@ -324,16 +374,52 @@ def first():
     print ""
 
 
+def atacar_image():
+    print ""
+    print ""
+    print """
+ ________  _________  _________  ________  ________  ___  __    ___       
+|\   __  \|\___   __\ \___   __\ \   __  \|\   ____\|\  \|\  \ |\  \      
+\ \  \|\  \|___ \  \_\|___ \  \_\ \  \|\  \ \  \___|\ \  \/  /|\ \  \     
+ \ \   __  \   \ \  \     \ \  \ \ \   __  \ \  \    \ \   ___  \ \  \    
+  \ \  \ \  \   \ \  \     \ \  \ \ \  \ \  \ \  \____\ \ \ \ \  \ \__\   
+   \ \__\ \__\   \ \__\     \ \__\ \ \__\ \__\ \_______\ \_\ \ \__\|__|   
+    \|__|\|__|    \|__|      \|__|  \|__|\|__|\|_______|\|__| \|__|   ___ 
+                                                                     |\__\ 
+                                                                     \|__|"""
+
+
+def image_skull():
+    print """
+                  _________-----_____
+       _____------           __      ----_
+___----             ___------              \ 
+   ----________        ----                 \ 
+               -----__    |             _____)
+                    __-                /     \ 
+        _______-----    ___--          \    /)\ 
+  ------_______      ---____            \__/  /
+               -----__    \ --    _          /\ 
+                      --__--__     \_____/   \_/\ 
+                              ----|   /          |
+                                  |  |___________|
+                                  |  | ((_(_)| )_)
+                                  |  \_((_(_)|/(_)
+                                  \             (
+                                   \_____________)"""
+
+
 
 def loading():
     """Function that displays a load message at the start of the game."""
     print """
-                                                 
-                                                 
-                            |  _  _  _|. _  _    
-                            |_(_)(_|(_||| |(_|...
-                                            _|   """
+                                                       
+                                                       
+                                  |  _  _  _|. _  _    
+                                  |_(_)(_|(_||| |(_|...
+                                                  _|   """
     time.sleep(2)
+
 
 
 def clear():
@@ -350,13 +436,18 @@ def menu():
         decision = raw_input(   ">* Choose an option: ")
         if decision == "1":
             clear()
-            user_decision()
+            print ""
+            loading()
+            clear()
+            single_secion()
+            print_tablero(BOARDCOMP)
             break
         elif decision == "2":
             print ""
             break
         elif decision == "3":
-            print "3"
+            clear()
+            instruccions_single()
             break
         elif decision == "4":
             clear()
@@ -367,7 +458,39 @@ def menu():
             print ""
 
 
+def instruccions_single():
+    print """
+
+        ____           __                  __  _                     
+       /  _/___  _____/ /________  _______/ /_(_)___  ____  _____    
+       / // __ \/ ___/ __/ ___/ / / / ___/ __/ / __ \/ __ \/ ___/    
+     _/ // / / (__  ) /_/ /  / /_/ / /__/ /_/ / /_/ / / / (__  )     
+    /___/_/ /_/____/\__/_/   \__,_/\___/\__/_/\____/_/ /_/____/
+
+
+    Before the battle you should place the ships on the board.
+    The measures of ships are:
+
+            Ship                          Measure
+
+            Aircraft......................5 squares
+            Battleship....................4 squares
+            Frigate.......................3 squares
+            Submarine.....................3 squares
+            Minesweeper...................2 squares
+ 
+ Enter the row number and column number where you want to place your boat.
+ You must enter numbers in the range of 1 - 10.
+"""
+    raw_input("    Press enter to return to the main menu... ")
+    clear()
+    first()
+    menu()
+
+
+
 clear()
+image_skull()
 loading()
 clear()
 first()
