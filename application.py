@@ -6,15 +6,52 @@ import random
 import copy
 import pygame
 
+pygame.mixer.init()
+
 BOARDCOMP = [] #This list stores the data of the computer board.
 USERBOARD = [] #This list stores the data of the user board.
 VERSUSBOARD = []
-COMPUTER_INSULTS = ["Hahaha. You like that?", "I will destroy you.", "That had to hurt", "Boom!", "Burn, baby!", "Squeal boy, squeal!", "Toasted!", "Die human!"]
+PLAYER2 = []
+HIDEN1 = []
+HIDEN2 = []
+
+
+COMPUTER_INSULTS = ["You like that?", "That had to hurt...", "Boom!", "Burn, baby!", "Squeal boy, squeal!", "Toasted!", "Loser!", "Eat that!", "Oh yeah!"]
+COMPUTER_SUFFER = ["Man Down!", "I'm under heavy attack!","I need some backup!"]
+
 
 
 SHIPS = {"aircraft": 5, "battleship": 4, "frigate": 3, "submarine": 3, "minesweeper": 2}
 CHARACTER = {"aircraft": "| A ", "battleship": "| B ", "frigate": "| F ", "submarine": "| S ", "minesweeper": "| M "}
 
+
+pygame.mixer.music.load("Mission Landing.mp3")
+
+
+SOUNDINVALID = pygame.mixer.Sound("SD_MENU_WRONG_12.wav")
+OPTIONSOUND = pygame.mixer.Sound("SD_MENU_SELECT_4.wav")
+
+
+IMPACT = pygame.mixer.Sound("EXPLOBIG.wav")
+EXPlOSION = pygame.mixer.Sound("explosion.wav")
+
+
+
+YOU_LIKE = pygame.mixer.Sound("You like that.wav")
+BOOM = pygame.mixer.Sound("Boom!.wav")
+LOSER = pygame.mixer.Sound("Loser.wav")
+YEAH = pygame.mixer.Sound("Oh yeah.wav")
+SQUEAL = pygame.mixer.Sound("Squeal boy.wav")
+TOASTED = pygame.mixer.Sound("Toasted.wav")
+BURN = pygame.mixer.Sound("Burn baby.wav")
+EAT = pygame.mixer.Sound("Eat that.wav")
+HURT = pygame.mixer.Sound("That hurt.wav")
+
+
+VICTORY = pygame.mixer.Sound("Winner.wav") 
+
+
+TAUNTS = {"You like that?": YOU_LIKE, "That had to hurt...": HURT, "Boom!": BOOM, "Burn, baby!": BURN, "Squeal boy, squeal!": SQUEAL, "Toasted!": TOASTED, "Loser!": LOSER, "Eat that!": EAT, "Oh yeah!":YEAH}
 
 
 def create(board):
@@ -324,7 +361,20 @@ def count_damage(board):
         count += 1
 
     if aircraft == 0 and battleship == 0 and frigate == 0 and submarine == 0 and minesweeper == 0:
-        print "Victory is yours"
+        VICTORY.play()
+        print ""
+        print "                     Victory is yours"
+        print ""
+        print u"""
+      __    __    _____     ____   ________     ____     ______    __      __ 
+      ).)  (.(   (_..._)   /.___) (___..___)   /.__.\   (...__.\   ).\    /.( 
+     (.(    ).)    |.|    /./         ).)     /./..\.\   ).(__).)   \.\  /./  
+      \.\  /./     |.|   (.(         (.(     (.()..().) (....__/     \.\/./   
+       \.\/./      |.|   (.(          ).)    (.()..().)  ).\.\.._     \../    
+        \../      _|.|__  \.\___     (.(      \.\__/./  (.(.\.\_))     )(     
+         \/      /_____(   \____)    /__\      \____/    )_).\__/     /__\    
+     .........................................................................
+"""
         return True
     else:
         return False
@@ -352,7 +402,18 @@ def count_damage_comp(board):
         count += 1
 
     if aircraft == 0 and battleship == 0 and frigate == 0 and submarine == 0 and minesweeper == 0:
-        print "You lose"
+        print ""
+        print "                     You've been defeated"
+        print ""
+        print """
+      ._______..._______.._______.._______.....___....___________.
+      |       \.|  .____||  .____||  .____|.../   \..|           |
+      |  .--.  ||  |__...|  |__...|  |__...../ .^. \.`---|  |----`
+      |  |..|  ||  .__|..|  .__|..|  .__|.../  /_\  \....|  |.....
+      |  '--'  ||  |____.|  |.....|  |____./  _____  \...|  |.....
+      |_______/.|_______||__|.....|_______/__/.....\__\..|__|.....
+      ............................................................
+"""
         return True
     else:
         return False
@@ -410,13 +471,17 @@ def hit_boat_computer(board, hitrow, hitcol):
         elif "| x " in board[hitrow][hitcol]:
             return 1
         else:
+            EXPlOSION.play()
             board[hitrow][hitcol] = "| x "
             print_tablero(board)
+            insulto = random.choice(COMPUTER_INSULTS)
             print ""
-            print "   Enemy message: " + random.choice(COMPUTER_INSULTS)
+            print "   Enemy message: " + str(insulto)
             print ""
             statistics_user(board)
             print "   The enemy has impacted your boat."
+            time.sleep(0.4)
+            TAUNTS[insulto].play()
             raw_input("   Press enter...")
             return 1
 
@@ -471,6 +536,7 @@ def hit_boat(hiden_board, board, hitrow, hitcol):
             raw_input("   Press enter and try again...")
             return 0
         else:
+            IMPACT.play()
             hiden_board[hitrow][hitcol] = "| x "
             board[hitrow][hitcol] = "| x "
             print "                  Your turn"
@@ -504,13 +570,15 @@ def mainvarios(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5):
 
 def new_game_single():
     while True:
-        playAgain = raw_input("    Play again? y/n")
+        playAgain = raw_input("    Play again? y/n ")
         playAgain = playAgain.lower()
         if playAgain == "y" or playAgain == "yes":
+            limpiar(USERBOARD, BOARDCOMP, VERSUSBOARD)
             clear()
             single_secion()
             break
         elif playAgain == "n" or playAgain == "no" or playAgain == "not":
+            limpiar(USERBOARD, BOARDCOMP, VERSUSBOARD)
             clear()
             first()
             menu()
@@ -518,6 +586,15 @@ def new_game_single():
         else:
             print ""
             print chr(27) + "[0;91m" + "   ✘ Please enter 'y' or 'n' " + chr(27) + "[0m"
+
+
+
+def limpiar(board1, board2, board3 ):
+    for count in range(10):
+        del board1[0]
+        del board2[0]
+        del board3[0]
+
 
 
 def single_secion():
@@ -638,6 +715,7 @@ def menu():
     while True:
         decision = raw_input(   ">* Choose an option: ")
         if decision == "1":
+            OPTIONSOUND.play()
             clear()
             print ""
             loading()
@@ -650,6 +728,7 @@ def menu():
             count_damage(BOARDCOMP)
             break
         elif decision == "3":
+            OPTIONSOUND.play()
             clear()
             instruccions_single()
             break
@@ -657,6 +736,7 @@ def menu():
             clear()
             break
         else:
+            SOUNDINVALID.play()
             print ""
             print chr(27) + "[0;91m" + "   ✘ Please enter NUMBERS from 1 to 4." + chr(27) + "[0m"
             print ""
@@ -685,8 +765,17 @@ def instruccions_single():
  
  Enter the row number and column number where you want to place your boat.
  You must enter numbers in the range of 1 - 10.
+ 
+ You must enter the orientation of your boat. It can be vertical or horizontal. 
+ You should enter the letter "V" for vertical, or the letter "H" for horizontal.
+ 
+ When you hit the enemy ship you get one more chance.
+ When the enemy hit your ship, the enemy gets one more chance.
+
+ The game ends when all boats of any opponent, are destroyed.
+ 
 """
-    raw_input("    Press enter to return to the main menu... ")
+    raw_input("    Press enter to return to Main Menu... ")
     clear()
     first()
     menu()
@@ -697,6 +786,7 @@ clear()
 image_skull()
 loading()
 clear()
+pygame.mixer.music.play(2)
 first()
 menu()
 
