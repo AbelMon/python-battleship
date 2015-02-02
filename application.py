@@ -4,6 +4,7 @@ import os
 import time
 import random
 import copy
+import pygame
 
 BOARDCOMP = [] #This list stores the data of the computer board.
 USERBOARD = [] #This list stores the data of the user board.
@@ -240,6 +241,123 @@ def entering_number_col():
             print ""
             print chr(27) + "[0;91m" + "     ✘ Please enter numbers!" + chr(27) + "[0m"
 
+
+def statistics(board):
+    count = 0
+    aircraft = 0
+    battleship = 0
+    frigate = 0
+    submarine = 0
+    minesweeper = 0
+    while count != 10:
+        for col in range(10):
+            if "| A " in board[count][col]:
+                aircraft += 1
+            if "| B " in board[count][col]:
+                battleship += 1
+            if "| F " in board[count][col]:
+                frigate += 1
+            if "| S " in board[count][col]:
+                submarine += 1
+            if "| M " in board[count][col]:
+                minesweeper += 1
+        count += 1
+    print ""
+    print "        Enemy ships        Squares undamaged"
+    print "         Aircraft:               ", aircraft
+    print "         Battleship:             ", battleship
+    print "         Submarine:              ", submarine
+    print "         Frigate:                ", frigate
+    print "         Minesweeper:            ", minesweeper
+    print ""
+
+
+def statistics_user(board):
+    count = 0
+    aircraft = 0
+    battleship = 0
+    frigate = 0
+    submarine = 0
+    minesweeper = 0
+    while count != 10:
+        for col in range(10):
+            if "| A " in board[count][col]:
+                aircraft += 1
+            if "| B " in board[count][col]:
+                battleship += 1
+            if "| F " in board[count][col]:
+                frigate += 1
+            if "| S " in board[count][col]:
+                submarine += 1
+            if "| M " in board[count][col]:
+                minesweeper += 1
+        count += 1
+    print ""
+    print "         Your ships        Squares undamaged"
+    print "         Aircraft:               ", aircraft
+    print "         Battleship:             ", battleship
+    print "         Submarine:              ", submarine
+    print "         Frigate:                ", frigate
+    print "         Minesweeper:            ", minesweeper
+    print ""
+
+
+def count_damage(board):
+    count = 0
+    aircraft = 0
+    battleship = 0
+    frigate = 0
+    submarine = 0
+    minesweeper = 0
+    while count != 10:
+        for col in range(10):
+            if "| A " in board[count][col]:
+                aircraft += 1
+            if "| B " in board[count][col]:
+                battleship += 1
+            if "| F " in board[count][col]:
+                frigate += 1
+            if "| S " in board[count][col]:
+                submarine += 1
+            if "| M " in board[count][col]:
+                minesweeper += 1
+        count += 1
+
+    if aircraft == 0 and battleship == 0 and frigate == 0 and submarine == 0 and minesweeper == 0:
+        print "Victory is yours"
+        return True
+    else:
+        return False
+
+
+def count_damage_comp(board):
+    count = 0
+    aircraft = 0
+    battleship = 0
+    frigate = 0
+    submarine = 0
+    minesweeper = 0
+    while count != 10:
+        for col in range(10):
+            if "| A " in board[count][col]:
+                aircraft += 1
+            if "| B " in board[count][col]:
+                battleship += 1
+            if "| F " in board[count][col]:
+                frigate += 1
+            if "| S " in board[count][col]:
+                submarine += 1
+            if "| M " in board[count][col]:
+                minesweeper += 1
+        count += 1
+
+    if aircraft == 0 and battleship == 0 and frigate == 0 and submarine == 0 and minesweeper == 0:
+        print "You lose"
+        return True
+    else:
+        return False
+
+
 def main():
     row = random_row(BOARDCOMP)
     col = random_col(BOARDCOMP)
@@ -260,11 +378,13 @@ def main():
 
 def game_alone():
     print_tablero(VERSUSBOARD)
+    statistics(BOARDCOMP)
     adivina_row = entering_number_row()
     adivina_col = entering_number_col()
     clear()
     view_board = hit_boat(BOARDCOMP, VERSUSBOARD, adivina_row, adivina_col)
     return view_board
+
 
 
 def computer_turn():
@@ -274,44 +394,49 @@ def computer_turn():
     return view_board
 
 
+
 def hit_boat_computer(board, hitrow, hitcol):
     if "|   " in board[hitrow][hitcol]:
         board[hitrow][hitcol] = "| o "
         print_tablero(board)
-        print "The enemy has failed."
-        print "Now it's your turn."
-        raw_input("Press enter...")
-        return True
+        statistics_user(board)
+        print "    The enemy has failed."
+        print "    Now it's your turn."
+        raw_input("    Press enter...")
+        return 0
     else:
         if "| o " in board[hitrow][hitcol]:
-            return False
+            return 1
         elif "| x " in board[hitrow][hitcol]:
-            return False
+            return 1
         else:
             board[hitrow][hitcol] = "| x "
             print_tablero(board)
             print ""
-            print "Enemy message: " + random.choice(COMPUTER_INSULTS)
+            print "   Enemy message: " + random.choice(COMPUTER_INSULTS)
             print ""
-            print "The enemy has impacted your boat."
-            print "The enemy has a new attempt."
-            raw_input("Press enter...")
-            return False
+            statistics_user(board)
+            print "   The enemy has impacted your boat."
+            raw_input("   Press enter...")
+            return 1
 
 
 
 def turnos():
     create(VERSUSBOARD)
-    turn = True
-    while True:
-        while turn == True:
+    turn = 0
+    destruction = False
+    while destruction == False:
+        if turn == 0:
             clear()
-            print "   Your turn"
+            print "                  Your turn"
             turn = game_alone()
-        else:
+            destruction = count_damage(BOARDCOMP)
+        elif turn == 1:
             clear()
-            print "   Computer"
+            print "                  Enemy's turn"
             turn = computer_turn()
+            destruction = count_damage_comp(USERBOARD)
 
 
 
@@ -320,34 +445,41 @@ def hit_boat(hiden_board, board, hitrow, hitcol):
         hiden_board[hitrow][hitcol] = "| o "
         board[hitrow][hitcol] = "| o "
         clear()
+        print "                  Your turn"
         print_tablero(hiden_board)
-        print "You failed"
-        print "It is turn of the enemy."
-        raw_input("Press enter...")
-        return False
+        statistics(hiden_board)
+        print "      You failed"
+        print "      It is turn of the enemy."
+        print ""
+        raw_input("      Press enter...")
+        return 1
     else:
         if "| o " in hiden_board[hitrow][hitcol]:
+            print "                  Your turn"
             print_tablero(board)
+            statistics(hiden_board)
             print ""
-            print "You've already shot that position. Try again."
-            raw_input("Press enter and try again...")
-            return True
+            print "   You've already shot that position. Try again."
+            raw_input("   Press enter and try again...")
+            return 0
         elif "| x " in hiden_board[hitrow][hitcol]:
+            print "                  Your turn"
             print_tablero(board)
+            statistics(hiden_board)
             print ""
-            print "You've already shot that position. Try again."
-            raw_input("Press enter and try again...")
-            return True
+            print "   You've already shot that position. Try again."
+            raw_input("   Press enter and try again...")
+            return 0
         else:
             hiden_board[hitrow][hitcol] = "| x "
             board[hitrow][hitcol] = "| x "
+            print "                  Your turn"
             print_tablero(board)
+            statistics(hiden_board)
             print ""
-            print "You've hit the enemy ship!"
-            print "Yuo got another turn."
-            raw_input("Press enter...")
-            return True
-
+            print "   You've hit the enemy ship!"
+            raw_input("   Press enter...")
+            return 0
 
 
 def mainvarios(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5):
@@ -369,6 +501,23 @@ def mainvarios(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5):
             BOARDCOMP[guessx - 1][guessy - 1] = "| X "
             print_tablero(BOARDCOMP)
 
+
+def new_game_single():
+    while True:
+        playAgain = raw_input("    Play again? y/n")
+        playAgain = playAgain.lower()
+        if playAgain == "y" or playAgain == "yes":
+            clear()
+            single_secion()
+            break
+        elif playAgain == "n" or playAgain == "no" or playAgain == "not":
+            clear()
+            first()
+            menu()
+            break
+        else:
+            print ""
+            print chr(27) + "[0;91m" + "   ✘ Please enter 'y' or 'n' " + chr(27) + "[0m"
 
 
 def single_secion():
@@ -393,6 +542,8 @@ def single_secion():
     atacar_image()
     time.sleep(2)
     turnos()
+    new_game_single()
+
     pass
 
 
@@ -492,10 +643,11 @@ def menu():
             loading()
             clear()
             single_secion()
-            print_tablero(BOARDCOMP)
             break
         elif decision == "2":
-            print ""
+            computer_ships()
+            print_tablero(BOARDCOMP)
+            count_damage(BOARDCOMP)
             break
         elif decision == "3":
             clear()
