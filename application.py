@@ -25,11 +25,13 @@ SHIPS = {"aircraft": 5, "battleship": 4, "frigate": 3, "submarine": 3, "mineswee
 CHARACTER = {"aircraft": "| A ", "battleship": "| B ", "frigate": "| F ", "submarine": "| S ", "minesweeper": "| M "}
 
 
-pygame.mixer.music.load("Mission Landing.mp3")
+MENUMUSIC = pygame.mixer.Sound("Mission Landing.wav")
 
 
 SOUNDINVALID = pygame.mixer.Sound("SD_MENU_WRONG_12.wav")
 OPTIONSOUND = pygame.mixer.Sound("SD_MENU_SELECT_4.wav")
+BADDATA = pygame.mixer.Sound("SD_MENU_WRONG_11.wav")
+OTHERVALID = pygame.mixer.Sound("SD_MENU_SELECT_3.wav")
 
 
 IMPACT = pygame.mixer.Sound("EXPLOBIG.wav")
@@ -37,7 +39,7 @@ EXPlOSION = pygame.mixer.Sound("explosion.wav")
 
 
 
-YOU_LIKE = pygame.mixer.Sound("You like that.wav")
+YOU_LIKE = pygame.mixer.Sound("You like that.wav") 
 BOOM = pygame.mixer.Sound("Boom!.wav")
 LOSER = pygame.mixer.Sound("Loser.wav")
 YEAH = pygame.mixer.Sound("Oh yeah.wav")
@@ -86,10 +88,10 @@ def random_col(board):
     return random.randint(0, len(board[0]) - 1)
 
 
-def user_decision():
+def user_decision(board):
     """This function allows the user to decide the position of their ships."""
-    create(USERBOARD)
-    print_tablero(USERBOARD)
+    create(board)
+    print_tablero(board)
     for boat in SHIPS:
         condicion = False
         while condicion == False: #This allows repeat the cycle every time an error is returned.
@@ -101,18 +103,18 @@ def user_decision():
             placecol = entering_number_col()
             position = user_vertical_horizontal()
             if position == "h":
-                there_are_boat = no_intersection_horizontal(USERBOARD,SHIPS, boat, placerow, placecol)
+                there_are_boat = no_intersection_horizontal(board, SHIPS, boat, placerow, placecol)
                 if there_are_boat != False:
-                    placing_ship_horizon(USERBOARD,placerow, placecol, boat)
+                    placing_ship_horizon(board, placerow, placecol, boat)
                     clear()
-                    print_tablero(USERBOARD)
+                    print_tablero(board)
                     condicion = True
             elif position == "v":
-                boat_in_vertical = no_exist_vertical(USERBOARD, SHIPS, boat, placerow, placecol)
+                boat_in_vertical = no_exist_vertical(board, SHIPS, boat, placerow, placecol)
                 if boat_in_vertical != False:
-                    placing_ship_vertical(USERBOARD, placerow, placecol, boat)
+                    placing_ship_vertical(board, placerow, placecol, boat)
                     clear()
-                    print_tablero(USERBOARD)
+                    print_tablero(board)
                     condicion = True
 
 
@@ -256,6 +258,7 @@ def entering_number_row():
                 print ""
                 print chr(27) + "[0;91m" + "     ✘ Please enter numbers in the range of 1 - 10." + chr(27) + "[0m"
         except:
+            BADDATA.play()
             print ""
             print chr(27) + "[0;91m" + "     ✘ Please enter numbers!" + chr(27) + "[0m"
 
@@ -362,9 +365,22 @@ def count_damage(board):
 
     if aircraft == 0 and battleship == 0 and frigate == 0 and submarine == 0 and minesweeper == 0:
         VICTORY.play()
-        print ""
-        print "                     Victory is yours"
-        print ""
+
+        if board == PLAYER2:
+            print ""
+            print "                     Player 1 wins!"
+            print ""
+
+        elif board == USERBOARD:
+            print ""
+            print "                     Player 2 wins!"
+            print ""
+
+        elif board == BOARDCOMP:
+            print ""
+            print "                     You win!"
+            print ""
+
         print u"""
       __    __    _____     ____   ________     ____     ______    __      __ 
       ).)  (.(   (_..._)   /.___) (___..___)   /.__.\   (...__.\   ).\    /.( 
@@ -419,23 +435,6 @@ def count_damage_comp(board):
         return False
 
 
-def main():
-    row = random_row(BOARDCOMP)
-    col = random_col(BOARDCOMP)
-    print row
-    print col
-    userrow = entering_number_row()
-    usercol = entering_number_col()
-    print userrow
-    print ">>>"
-    print type(userrow)
-    if userrow == row and usercol == col:
-        print "Well done!"
-    else:
-        BOARDCOMP[userrow - 1][usercol - 1] = "| X "
-        print_tablero(BOARDCOMP)
-
-
 
 def game_alone():
     print_tablero(VERSUSBOARD)
@@ -444,6 +443,17 @@ def game_alone():
     adivina_col = entering_number_col()
     clear()
     view_board = hit_boat(BOARDCOMP, VERSUSBOARD, adivina_row, adivina_col)
+    return view_board
+
+
+
+def game_multiplayer(hiden_board, show_board):
+    print_tablero(show_board)
+    statistics(hiden_board)
+    adivina_row = entering_number_row()
+    adivina_col = entering_number_col()
+    clear()
+    view_board = hit_boat(hiden_board, show_board, adivina_row, adivina_col)
     return view_board
 
 
@@ -459,6 +469,8 @@ def computer_turn():
 def hit_boat_computer(board, hitrow, hitcol):
     if "|   " in board[hitrow][hitcol]:
         board[hitrow][hitcol] = "| o "
+        print "                  Poor shooting!"
+        print ""
         print_tablero(board)
         statistics_user(board)
         print "    The enemy has failed."
@@ -473,6 +485,8 @@ def hit_boat_computer(board, hitrow, hitcol):
         else:
             EXPlOSION.play()
             board[hitrow][hitcol] = "| x "
+            print "                  Impact!"
+            print ""
             print_tablero(board)
             insulto = random.choice(COMPUTER_INSULTS)
             print ""
@@ -486,7 +500,6 @@ def hit_boat_computer(board, hitrow, hitcol):
             return 1
 
 
-
 def turnos():
     create(VERSUSBOARD)
     turn = 0
@@ -495,13 +508,40 @@ def turnos():
         if turn == 0:
             clear()
             print "                  Your turn"
+            print ""
+            print ""
+            print ""
             turn = game_alone()
             destruction = count_damage(BOARDCOMP)
         elif turn == 1:
             clear()
             print "                  Enemy's turn"
+            print ""
             turn = computer_turn()
             destruction = count_damage_comp(USERBOARD)
+
+
+
+def turnos_multiplayer():
+    turn = 0
+    destruction = False
+    while destruction == False:
+        if turn == 0:
+            clear()
+            print "                  Shoot Player 1"
+            print ""
+            print ""
+            print ""
+            turn = game_multiplayer(PLAYER2, HIDEN2)
+            destruction = count_damage(PLAYER2)
+        elif turn == 1:
+            clear()
+            print "                  Shoot Player 2"
+            print ""
+            print ""
+            print ""
+            turn = game_multiplayer(USERBOARD, HIDEN1)
+            destruction = count_damage(USERBOARD)
 
 
 
@@ -510,42 +550,104 @@ def hit_boat(hiden_board, board, hitrow, hitcol):
         hiden_board[hitrow][hitcol] = "| o "
         board[hitrow][hitcol] = "| o "
         clear()
-        print "                  Your turn"
+        if hiden_board == PLAYER2:
+            print "                  Shoot Player 1"
+        elif hiden_board == USERBOARD:
+            print "                  Shoot Player 2"
+        else:
+            print "                  Your Turn"
+
+        print ""
+        print "                  Poor shooting!"
+        print ""
         print_tablero(hiden_board)
         statistics(hiden_board)
-        print "      You failed"
-        print "      It is turn of the enemy."
         print ""
+        print "      You failed"
+
+        if hiden_board == PLAYER2:
+            print "      It's turn of player 2"
+        elif hiden_board == USERBOARD:
+            print "      It's turn of player 1"
+        else:
+            print "      It's the enemy's turn!"
+
         raw_input("      Press enter...")
-        return 1
+
+        if hiden_board == USERBOARD:
+            return 0
+        else:
+            return 1
+
     else:
         if "| o " in hiden_board[hitrow][hitcol]:
-            print "                  Your turn"
+
+            if hiden_board == PLAYER2:
+                print "                  Shoot Player 1"
+            elif hiden_board == USERBOARD:
+                print "                  Shoot Player 2"
+            else:
+                print "                  Your Turn"
+            print ""
+            print "                    Not again!"
+            print ""
             print_tablero(board)
             statistics(hiden_board)
             print ""
             print "   You've already shot that position. Try again."
             raw_input("   Press enter and try again...")
-            return 0
+
+            if hiden_board == USERBOARD:
+                return 1
+            else:
+                return 0
+
         elif "| x " in hiden_board[hitrow][hitcol]:
-            print "                  Your turn"
+
+            if hiden_board == PLAYER2:
+                print "                  Shoot Player 1"
+            elif hiden_board == USERBOARD:
+                print "                  Shoot Player 2"
+            else:
+                print "                  Your Turn"
+
+            print ""
+            print "                    Not again!"
+            print ""
             print_tablero(board)
             statistics(hiden_board)
             print ""
             print "   You've already shot that position. Try again."
             raw_input("   Press enter and try again...")
-            return 0
+            if hiden_board == USERBOARD:
+                return 1
+            else:
+                return 0
         else:
             IMPACT.play()
             hiden_board[hitrow][hitcol] = "| x "
             board[hitrow][hitcol] = "| x "
-            print "                  Your turn"
+
+            if hiden_board == PLAYER2:
+                print "                  Shoot Player 1"
+            elif hiden_board == USERBOARD:
+                print "                  Shoot Player 2"
+            else:
+                print "                  Your Turn"
+
+            print ""
+            print "                  Impact!"
+            print ""
             print_tablero(board)
             statistics(hiden_board)
             print ""
             print "   You've hit the enemy ship!"
             raw_input("   Press enter...")
-            return 0
+            if hiden_board == USERBOARD:
+                return 1
+            else:
+                return 0
+
 
 
 def mainvarios(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5):
@@ -573,12 +675,12 @@ def new_game_single():
         playAgain = raw_input("    Play again? y/n ")
         playAgain = playAgain.lower()
         if playAgain == "y" or playAgain == "yes":
-            limpiar(USERBOARD, BOARDCOMP, VERSUSBOARD)
+            limpiar(USERBOARD, BOARDCOMP, VERSUSBOARD, PLAYER2, HIDEN1, HIDEN2)
             clear()
             single_secion()
             break
         elif playAgain == "n" or playAgain == "no" or playAgain == "not":
-            limpiar(USERBOARD, BOARDCOMP, VERSUSBOARD)
+            limpiar(USERBOARD, BOARDCOMP, VERSUSBOARD, PLAYER2, HIDEN1, HIDEN2)
             clear()
             first()
             menu()
@@ -589,12 +691,97 @@ def new_game_single():
 
 
 
-def limpiar(board1, board2, board3 ):
-    for count in range(10):
-        del board1[0]
-        del board2[0]
-        del board3[0]
+def new_game_multiplayer():
+    while True:
+        new_game = raw_input("    Play again? y/n ")
+        new_game = new_game.lower()
+        if new_game == "y" or new_game == "yes":
+            limpiar(USERBOARD, BOARDCOMP, VERSUSBOARD, PLAYER2, HIDEN1, HIDEN2)
+            clear()
+            multiplayer()
+            break
+        elif new_game == "n" or new_game == "no" or new_game == "not":
+            limpiar(USERBOARD, BOARDCOMP, VERSUSBOARD, PLAYER2, HIDEN1, HIDEN2)
+            clear()
+            first()
+            menu()
+            break
+        else:
+            print ""
+            print chr(27) + "[0;91m" + "   ✘ Please enter 'y' or 'n' " + chr(27) + "[0m"
 
+
+
+def limpiar(board1, board2, board3, board4, board5, board6):
+    length_board1 = len(board1)
+    length_board2 = len(board2)
+    length_board3 = len(board3)
+    length_board4 = len(board4)
+    length_board5 = len(board5)
+    length_board6 = len(board6)
+
+    if length_board1 > 0:
+        for count in range(length_board1):
+            del board1[0]
+
+    if length_board2 > 0:
+        for count in range(length_board2):
+            del board2[0]
+
+    if length_board3 > 0:
+        for count in range(length_board3):
+            del board3[0]
+
+    if length_board4 > 0:
+        for count in range(length_board4):
+            del board4[0]
+
+    if length_board5 > 0:
+        for count in range(length_board5):
+            del board5[0]
+
+    if length_board6 > 0:
+        for count in range(length_board6):
+            del board6[0]
+
+
+
+def multiplayer():
+    loading()
+    print ""
+    print ""
+    print "          Player 1 places your ships"
+    print ""
+    raw_input("          Press enter to continue...")
+    clear()
+    print "     It's time to deploy your ships."
+    print "     Enter the coordinates."
+    user_decision(USERBOARD)
+    create(HIDEN1)
+    print ""
+    print "         All ships in position."
+    raw_input("         Press enter to continue...")
+    clear()
+    print ""
+    print "          Player 2 places your ships"
+    print ""
+    raw_input("         Press enter to continue...")
+    clear()
+    print "     It's time to deploy your ships."
+    print "     Enter the coordinates."
+    user_decision(PLAYER2)
+    create(HIDEN2)
+    print ""
+    print "         All ships in position."
+    print "         It's time to fight!"
+    print ""
+    raw_input("         Press enter to continue...")
+    clear()
+    atacar_image()
+    time.sleep(2)
+    clear()
+    turnos_multiplayer()
+    new_game_multiplayer()
 
 
 def single_secion():
@@ -608,7 +795,7 @@ def single_secion():
     print ""
     print "     It's time to deploy your ships."
     print "     Enter the coordinates."
-    user_decision()
+    user_decision(USERBOARD)
     print ""
     print "         All ships in position."
     print ""
@@ -643,16 +830,20 @@ def first():
     print "   >Welcome to Battleship! Are you ready for war? Everyone to combat positions!"
     print ""
     time.sleep(0.5)
+    OTHERVALID.play().set_volume(0.1)
     print "   >Press 1 for single player session."
     time.sleep(0.5)
+    OTHERVALID.play().set_volume(0.1)
     print "   >Press 2 for multiplayer session."
     time.sleep(0.5)
+    OTHERVALID.play().set_volume(0.1)
     print "   >Press 3 to see the game instructions."
     time.sleep(0.5)
+    OTHERVALID.play().set_volume(0.1)
     print "   >Press 4 to exit the program."
     time.sleep(0.5)
     print ""
-
+    OTHERVALID.play().set_volume(0.1)
 
 def atacar_image():
     print ""
@@ -723,9 +914,9 @@ def menu():
             single_secion()
             break
         elif decision == "2":
-            computer_ships()
-            print_tablero(BOARDCOMP)
-            count_damage(BOARDCOMP)
+            clear()
+            OPTIONSOUND.play()
+            multiplayer()
             break
         elif decision == "3":
             OPTIONSOUND.play()
@@ -786,7 +977,7 @@ clear()
 image_skull()
 loading()
 clear()
-pygame.mixer.music.play(2)
+MENUMUSIC.play(-1)
 first()
 menu()
 
