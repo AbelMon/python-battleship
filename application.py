@@ -8,6 +8,7 @@ import pygame
 
 pygame.mixer.init()
 
+
 BOARDCOMP = [] #This list stores the data of the computer board.
 USERBOARD = [] #This list stores the data of the user board.
 VERSUSBOARD = []
@@ -24,9 +25,7 @@ COMPUTER_SUFFER = ["Man Down!", "I'm under heavy attack!","I need some backup!"]
 SHIPS = {"aircraft": 5, "battleship": 4, "frigate": 3, "submarine": 3, "minesweeper": 2}
 CHARACTER = {"aircraft": "| A ", "battleship": "| B ", "frigate": "| F ", "submarine": "| S ", "minesweeper": "| M "}
 
-
-MENUMUSIC = pygame.mixer.Sound("Mission Landing.wav")
-
+pygame.mixer.music.load("Skyward Fire (Original Version).mp3")
 
 SOUNDINVALID = pygame.mixer.Sound("SD_MENU_WRONG_12.wav")
 OPTIONSOUND = pygame.mixer.Sound("SD_MENU_SELECT_4.wav")
@@ -67,14 +66,14 @@ def print_tablero(board):
     """Prints board list to be displayed as a game board on the screen."""
     print ""
     print "      1   2   3   4   5   6   7   8   9  10"
-    print "    -----------------------------------------"
+    print chr(27) + "[0;94m" + "    -----------------------------------------" + chr(27) + "[0m"
     for fila, elemento in enumerate(board):
         if fila < 9:
-            print fila + 1, " ", "".join(elemento) + "|"
-            print "    -----------------------------------------"
+            print fila + 1, chr(27) + "[0;94m" + " ", "".join(elemento) + "|"
+            print "    -----------------------------------------" + chr(27) + "[0m"
         else:
-            print fila + 1,"", "".join(elemento) + "|"
-            print "    -----------------------------------------" 
+            print fila + 1,chr(27) + "[0;94m"+ "", "".join(elemento) + "|"
+            print "    -----------------------------------------" + chr(27) + "[0m"
 
 
 def random_row(board):
@@ -92,10 +91,10 @@ def user_decision(board):
     """This function allows the user to decide the position of their ships."""
     create(board)
     print_tablero(board)
-    for boat in SHIPS:
+    for boat in SHIPS: #Choose one by one the boats in the dictionary to be placed.
         condicion = False
         while condicion == False: #This allows repeat the cycle every time an error is returned.
-            if boat == "aircraft":
+            if boat == "aircraft": #
                 print ">- Place an " + chr(27) + "[3;96m" + boat + chr(27) + "[0m", "it measures", chr(27) + "[3;96m"+ str(SHIPS[boat]) + " squares." + chr(27) + "[0m"
             else:
                 print ">- Place a " + chr(27) + "[3;96m" + boat + chr(27) + "[0m", "it measures", chr(27) + "[3;96m"+ str(SHIPS[boat]) + " squares." + chr(27) + "[0m"
@@ -103,19 +102,19 @@ def user_decision(board):
             placecol = entering_number_col()
             position = user_vertical_horizontal()
             if position == "h":
-                there_are_boat = no_intersection_horizontal(board, SHIPS, boat, placerow, placecol)
-                if there_are_boat != False:
-                    placing_ship_horizon(board, placerow, placecol, boat)
+                there_are_boat = no_intersection_horizontal(board, SHIPS, boat, placerow, placecol) #Checks the existence of boats in horizontal position and  if they are put off the board
+                if there_are_boat != False: #If true, it means that no ships. Otherwise the loop is repeated again.
+                    placing_ship_horizon(board, placerow, placecol, boat) #Place the boats.
                     clear()
                     print_tablero(board)
-                    condicion = True
+                    condicion = True #The loop ends to spend the next boat.
             elif position == "v":
-                boat_in_vertical = no_exist_vertical(board, SHIPS, boat, placerow, placecol)
-                if boat_in_vertical != False:
-                    placing_ship_vertical(board, placerow, placecol, boat)
+                boat_in_vertical = no_exist_vertical(board, SHIPS, boat, placerow, placecol) #Checks the existence of boats in vertical position and  if they are put off the board.
+                if boat_in_vertical != False: #If true, it means that no ships. Otherwise the loop is repeated again.
+                    placing_ship_vertical(board, placerow, placecol, boat) #Place the boats.
                     clear()
                     print_tablero(board)
-                    condicion = True
+                    condicion = True #The loop ends to spend the next boat.
 
 
 
@@ -128,14 +127,17 @@ def no_intersection_horizontal(board,dict_ship, boat, row_x, col_y):
             if "|   " in board[row_x][col_y + number]:
                 count += 1 #When a string "|   " is found, adds 1 to the variable count.
     except: #If an error occurs, an error message is displayed and returns False.
+        BADDATA.play()
         print ""
         print chr(27) + "[0;91m" + "    ⚠ You can not put the boat in this position. It is off the board." + chr(27) + "[0m"
         print ""
         return False
 
-    if count == dict_ship[boat]: #If the value of "boat" and the value of "count" match, returns True
+    if count == dict_ship[boat]: #If the value of "boat" and the value of "count" match, returns True, it means there are no boats.
+        OTHERVALID.play().set_volume(0.1)
         return True
     else: #If the values are different, returns False.
+        SOUNDINVALID.play()
         print ""
         print chr(27) + "[0;91m" + "    ✘ In this position already exists a boat. Try again." + chr(27) + "[0m"
         print ""
@@ -152,14 +154,17 @@ def no_exist_vertical(board, dict_ship, boat, row_x, col_y):
             if "|   " in board[row_x + number][col_y]:
                 count += 1 #When a string "|   " is found, adds 1 to the variable count.
     except: #If an error occurs, an error message is displayed and returns False.
+        BADDATA.play()
         print ""
         print chr(27) + "[0;91m" + "    ⚠ You can not put the boat in this position. It is off the board." + chr(27) + "[0m"
         print ""
         return False
 
-    if count == dict_ship[boat]: #If the value of "boat" and the value of "count" match, returns True
+    if count == dict_ship[boat]: #If the value of "boat" and the value of "count" match, returns True, it means there are no boats.
+        OTHERVALID.play().set_volume(0.1)
         return True
     else: #If the values are different, returns False.
+        SOUNDINVALID.play()
         print ""
         print chr(27) + "[0;91m" + "    ✘ In this position already exists a boat. Try again." + chr(27) + "[0m"
         print ""
@@ -168,6 +173,7 @@ def no_exist_vertical(board, dict_ship, boat, row_x, col_y):
 
 
 def placing_ship_horizon(board, coordx, coordy, boat):
+    """Esta funcion permite colocar los barcos en posición horizontal."""
     try:
         for intento in range(SHIPS[boat]):
             board[coordx][coordy + intento] = CHARACTER[boat]
@@ -184,6 +190,7 @@ def placing_ship_horizon(board, coordx, coordy, boat):
 
 
 def placing_ship_vertical(board, coordx, coordy, boat):
+    """This function allows you to place the boats upright."""
     try:
         for intento in range(SHIPS[boat]):
             board[coordx + intento][coordy] = CHARACTER[boat]
@@ -200,6 +207,7 @@ def placing_ship_vertical(board, coordx, coordy, boat):
 
 
 def user_vertical_horizontal():
+    """This function allows the user to choose the position of the boat."""
     message_text = chr(27) + "[0;95m" + """
    //*Select the position of your boat.
    //*Press 'v' to place boat vertically.
@@ -211,12 +219,13 @@ def user_vertical_horizontal():
         decisionuser = raw_input("   >* v/h: ")
         decision_low = decisionuser.lower()
         if decision_low == "h":
-            return "h"
+            return "h" #If the user chooses horizontal, returns h, and another function is responsible for placing the ship.
             break
         elif decision_low == "v":
-            return "v"
+            return "v" #If the user chooses vertical, returns v, and another function is responsible for placing the ship.
             break
         else:
+            BADDATA.play()
             print ""
             print chr(27) + "[0;91m" + "              ✘ Invalid data!." + chr(27) + "[0m"
             print message_text
@@ -224,37 +233,40 @@ def user_vertical_horizontal():
 
 
 def computer_ships():
+    """This function places the computer's ships  randomly."""
     create(BOARDCOMP)
-    for boat in SHIPS:
+    for boat in SHIPS: #Choose one by one the boats in the dictionary to be placed.
         condicion = False
         while condicion == False:
             position = ["v", "h"]
-            numb_x = random_row(BOARDCOMP)
-            numb_y = random_col(BOARDCOMP)
-            positionchoice = random.choice(position)
+            numb_x = random_row(BOARDCOMP) ##Chooses row at random.
+            numb_y = random_col(BOARDCOMP) #Chooses column at random.
+            positionchoice = random.choice(position) #Chooses position at random.
             if positionchoice == "h":
-                no_boat = no_intersection_horizontal(BOARDCOMP, SHIPS, boat, numb_x, numb_y)
+                no_boat = no_intersection_horizontal(BOARDCOMP, SHIPS, boat, numb_x, numb_y) #Checks the existence of boats in horizontal position and  if they are put off the board
                 if no_boat != False:
-                    placing_ship_horizon(BOARDCOMP, numb_x, numb_y, boat)
+                    placing_ship_horizon(BOARDCOMP, numb_x, numb_y, boat) #Place the boats.
                     condicion = True
             elif positionchoice == "v":
-                no_boat_vertical = no_exist_vertical(BOARDCOMP, SHIPS, boat, numb_x, numb_y)
+                no_boat_vertical = no_exist_vertical(BOARDCOMP, SHIPS, boat, numb_x, numb_y) #Checks the existence of boats in vertical position and  if they are put off the board.
                 if no_boat_vertical != False:
-                    placing_ship_vertical(BOARDCOMP, numb_x, numb_y, boat)
+                    placing_ship_vertical(BOARDCOMP, numb_x, numb_y, boat) #Place the boats.
                     condicion = True
 
 
 def entering_number_row():
-    """Allows the user to guess the row number where a boat can be placed."""
+    """Allows the user to enter a row number."""
     while True:
         try:
             print ""
             guessrow = int(raw_input("   >Enter row: "))
             if guessrow >= 1 and guessrow <= 10:
+                OPTIONSOUND.play()
                 guessrow -= 1
                 return guessrow
                 break
             else:
+                SOUNDINVALID.play()
                 print ""
                 print chr(27) + "[0;91m" + "     ✘ Please enter numbers in the range of 1 - 10." + chr(27) + "[0m"
         except:
@@ -265,31 +277,35 @@ def entering_number_row():
 
 
 def entering_number_col():
-    """Allows the user to guess the column number where a boat can be placed."""
+    """Allows the user to enter a column number."""
     while True:
         try:
             print ""
             guesscol = int(raw_input("   >Enter column: "))
             if guesscol >= 1 and guesscol <=10:
+                OPTIONSOUND.play()
                 guesscol -= 1
                 return guesscol
                 break
             else:
+                SOUNDINVALID.play()
                 print ""
                 print chr(27) + "[0;91m" + "     ✘ Please enter numbers in the range of 1 - 10." + chr(27) + "[0m"
         except:
+            BADDATA.play()
             print ""
             print chr(27) + "[0;91m" + "     ✘ Please enter numbers!" + chr(27) + "[0m"
 
 
 def statistics(board):
+    """Allows you see the statistics of enemy boats on display."""
     count = 0
     aircraft = 0
     battleship = 0
     frigate = 0
     submarine = 0
     minesweeper = 0
-    while count != 10:
+    while count != 10: #Account in the entire list, the characters of vessels.
         for col in range(10):
             if "| A " in board[count][col]:
                 aircraft += 1
@@ -313,13 +329,14 @@ def statistics(board):
 
 
 def statistics_user(board):
+    """Allows you see the statistics your boats on display."""
     count = 0
     aircraft = 0
     battleship = 0
     frigate = 0
     submarine = 0
     minesweeper = 0
-    while count != 10:
+    while count != 10: #Account in the entire list, the characters of vessels.
         for col in range(10):
             if "| A " in board[count][col]:
                 aircraft += 1
@@ -343,13 +360,14 @@ def statistics_user(board):
 
 
 def count_damage(board):
+    """counts the number of characters of boats stored in the list, if there are no characters returns true, to finish the game."""
     count = 0
     aircraft = 0
     battleship = 0
     frigate = 0
     submarine = 0
     minesweeper = 0
-    while count != 10:
+    while count != 10: #Account in the entire list, the characters of vessels.
         for col in range(10):
             if "| A " in board[count][col]:
                 aircraft += 1
@@ -363,7 +381,7 @@ def count_damage(board):
                 minesweeper += 1
         count += 1
 
-    if aircraft == 0 and battleship == 0 and frigate == 0 and submarine == 0 and minesweeper == 0:
+    if aircraft == 0 and battleship == 0 and frigate == 0 and submarine == 0 and minesweeper == 0: #If there are no boats, means the game is over.
         VICTORY.play()
 
         if board == PLAYER2:
@@ -391,12 +409,13 @@ def count_damage(board):
          \/      /_____(   \____)    /__\      \____/    )_).\__/     /__\    
      .........................................................................
 """
-        return True
+        return True #Returns true to end the game.
     else:
-        return False
+        return False #If the condition is not met, returns false and the game continues.
 
 
 def count_damage_comp(board):
+    """Account the damage caused by the computer to the user"""
     count = 0
     aircraft = 0
     battleship = 0
@@ -417,9 +436,9 @@ def count_damage_comp(board):
                 minesweeper += 1
         count += 1
 
-    if aircraft == 0 and battleship == 0 and frigate == 0 and submarine == 0 and minesweeper == 0:
+    if aircraft == 0 and battleship == 0 and frigate == 0 and submarine == 0 and minesweeper == 0: 
         print ""
-        print "                     You've been defeated"
+        print "                     You've been defeated" #if no any ship, means the computer has won.
         print ""
         print """
       ._______..._______.._______.._______.....___....___________.
@@ -432,11 +451,12 @@ def count_damage_comp(board):
 """
         return True
     else:
-        return False
+        return False #If the condition is not met, returns false and the game continues.
 
 
 
 def game_alone():
+    """allows the user to guess where are the enemy ships."""
     print_tablero(VERSUSBOARD)
     statistics(BOARDCOMP)
     adivina_row = entering_number_row()
@@ -448,6 +468,7 @@ def game_alone():
 
 
 def game_multiplayer(hiden_board, show_board):
+    """allows the user to guess where are the enemy ships in a multiplayer session."""
     print_tablero(show_board)
     statistics(hiden_board)
     adivina_row = entering_number_row()
@@ -459,6 +480,7 @@ def game_multiplayer(hiden_board, show_board):
 
 
 def computer_turn():
+    """The computer tries to guess where are the boats."""
     hitrow = random_row(USERBOARD)
     hitcol = random_col(USERBOARD)
     view_board = hit_boat_computer(USERBOARD, hitrow, hitcol)
@@ -467,6 +489,7 @@ def computer_turn():
 
 
 def hit_boat_computer(board, hitrow, hitcol):
+    """f"""
     if "|   " in board[hitrow][hitcol]:
         board[hitrow][hitcol] = "| o "
         print "                  Poor shooting!"
@@ -501,6 +524,7 @@ def hit_boat_computer(board, hitrow, hitcol):
 
 
 def turnos():
+    """Manage shifts for a single player session."""
     create(VERSUSBOARD)
     turn = 0
     destruction = False
@@ -523,6 +547,7 @@ def turnos():
 
 
 def turnos_multiplayer():
+    """Manage shifts for a multi player session."""
     turn = 0
     destruction = False
     while destruction == False:
@@ -649,25 +674,6 @@ def hit_boat(hiden_board, board, hitrow, hitcol):
                 return 0
 
 
-
-def mainvarios(x1, y1, x2, y2, x3, y3, x4, y4, x5, y5):
-    BOARDCOMP[x1 - 1][y1 - 1] = "| 1 "
-    BOARDCOMP[x2 - 1][y2 - 1] = "| 2 "
-    BOARDCOMP[x3 - 1][y3 - 1] = "| 3 "
-    BOARDCOMP[x4 - 1][y4 - 1] = "| 4 "
-    BOARDCOMP[x5 - 1][y5 - 1] = "| 5 "
-    print_tablero(BOARDCOMP)
-    for turno in range(4):
-        guessx = entering_number_row()
-        guessy = entering_number_col()
-        if (guessx == x1 and guessy == y1) or (guessx == x2 and guessy == y2) or (guessx == x3 and guessy == y3) or (guessx == x4 and guessy == y4) or (guessx == x5 and guessy == y5):
-            print "Bien"
-            BOARDCOMP[guessx - 1][guessy - 1] = "| X "
-            print_tablero(BOARDCOMP)
-        else:
-            print "No adivinas"
-            BOARDCOMP[guessx - 1][guessy - 1] = "| X "
-            print_tablero(BOARDCOMP)
 
 
 def new_game_single():
@@ -813,25 +819,25 @@ def single_secion():
 
 def first():
     """This is a function that displays the name of the game and the menu instructions"""
-    print u""" 
+    print chr(27) + "[0;93m" + u""" 
 ██████╗**█████╗*████████╗████████╗██╗*****███████╗███████╗██╗**██╗██╗██████╗*██╗
 ██╔══██╗██╔══██╗╚══██╔══╝╚══██╔══╝██║*****██╔════╝██╔════╝██║**██║██║██╔══██╗██║
 ██████╔╝███████║***██║******██║***██║*****█████╗**███████╗███████║██║██████╔╝██║
 ██╔══██╗██╔══██║***██║******██║***██║*****██╔══╝**╚════██║██╔══██║██║██╔═══╝*╚═╝
 ██████╔╝██║**██║***██║******██║***███████╗███████╗███████║██║**██║██║██║*****██╗
 ╚═════╝*╚═╝**╚═╝***╚═╝******╚═╝***╚══════╝╚══════╝╚══════╝╚═╝**╚═╝╚═╝╚═╝*****╚═╝
-********************************************************************************"""
-    print """
+********************************************************************************"""+ chr(27) + "[0m"
+    print chr(27) + "[0;95m" +"""
                                     __/___
                               _____/______|
                       _______/_____\_______\_____
                       \              < < <       |
-                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"""
-    print "   >Welcome to Battleship! Are you ready for war? Everyone to combat positions!"
+                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~""" + chr(27) + "[0m"
+    print chr(27) + "[1;92m" + "   >Welcome to Battleship! Are you ready for war? Everyone to combat positions!" + chr(27) + "[0m"
     print ""
     time.sleep(0.5)
     OTHERVALID.play().set_volume(0.1)
-    print "   >Press 1 for single player session."
+    print chr(27) + "[3;33m" + "   >Press 1 for single player session."
     time.sleep(0.5)
     OTHERVALID.play().set_volume(0.1)
     print "   >Press 2 for multiplayer session."
@@ -840,7 +846,7 @@ def first():
     print "   >Press 3 to see the game instructions."
     time.sleep(0.5)
     OTHERVALID.play().set_volume(0.1)
-    print "   >Press 4 to exit the program."
+    print "   >Press 4 to exit the program." + chr(27) + "[0m"
     time.sleep(0.5)
     print ""
     OTHERVALID.play().set_volume(0.1)
@@ -977,7 +983,7 @@ clear()
 image_skull()
 loading()
 clear()
-MENUMUSIC.play(-1)
+pygame.mixer.music.play(-1)
 first()
 menu()
 
