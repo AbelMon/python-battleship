@@ -907,36 +907,35 @@ class battleship(object):
             os.system("cls")
 
 
+
+    def exit(self):
+        os.system("exit")
+
+
+
+    def method_exists(self, option):
+        dici = {"1": self.single_secion,  "2": self.multiplayer, "3": self.instruccions_single, "4": self.exit}
+        count = 0
+
+        if option in dici:
+            self.clear()
+            return dici[option]
+        else:
+            print ""
+            print chr(27) + "[0;91m" + "   ✘ Please enter NUMBERS from 1 to 4." + chr(27) + "[0m"
+            print ""
+            return self.menu
+
+
+
     def menu(self):
-        """Main Menu."""
-        while True:
-            decision = raw_input(   ">* Choose an option: ")
-            if decision == "1":
-                self.OPTIONSOUND.play()
-                self.clear()
-                print ""
-                self.loading()
-                self.clear()
-                self.single_secion()
-                break
-            elif decision == "2":
-                self.clear()
-                self.OPTIONSOUND.play()
-                self.multiplayer()
-                break
-            elif decision == "3":
-                self.OPTIONSOUND.play()
-                self.clear()
-                self.instruccions_single()
-                break
-            elif decision == "4":
-                self.clear()
-                break
-            else:
-                self.SOUNDINVALID.play()
-                print ""
-                print chr(27) + "[0;91m" + "   ✘ Please enter NUMBERS from 1 to 4." + chr(27) + "[0m"
-                print ""
+        cosa = False
+        while cosa == False:
+            option = raw_input(   ">* Choose an option: ")
+            cosa = self.method_exists(option)
+            cosa()
+            break
+
 
 
     def instruccions_single(self):
@@ -989,5 +988,3 @@ class battleship(object):
 
 jugar = battleship()
 jugar.arranque()
-
-
