@@ -1039,3 +1039,4 @@ class battleship(object):
         self.menu()
 
 jugar = battleship()
+jugar.arranque()
