@@ -5,6 +5,7 @@ import time
 import random
 import copy
 import pygame
+import sys
 
 pygame.mixer.init()
 
@@ -101,8 +102,13 @@ class battleship(object):
                 else:
                     print ">- Place a " + chr(27) + "[3;96m" + boat + chr(27) + "[0m", "it measures", chr(27) + "[3;96m"+ str(self.SHIPS[boat]) + " squares." + chr(27) + "[0m"
                 placerow = self.entering_number_row()
+                if placerow == "exit":
+                    break
                 placecol = self.entering_number_col()
+                if placecol == "exit":
+                    break
                 position = self.user_vertical_horizontal()
+
                 if position == "h":
                     there_are_boat = self.no_intersection_horizontal(board, self.SHIPS, boat, placerow, placecol) #Checks the existence of boats in horizontal position and  if they are put off the board
                     if there_are_boat != False: #If true, it means that no ships. Otherwise the loop is repeated again.
@@ -255,46 +261,66 @@ class battleship(object):
 
 
     def entering_number_row(self):
-        """Allows the user to enter a row number."""
-        while True:
-            try:
+            """Allows the user to enter a row number."""
+            while True:
                 print ""
-                guessrow = int(raw_input("   >Enter row: "))
-                if guessrow >= 1 and guessrow <= 10:
-                    self.OPTIONSOUND.play()
-                    guessrow -= 1
+                guessrow = raw_input("   >Enter row: ")
+                if guessrow == "exit":
+                    self.clear()
+                    self.limpiar(self.USERBOARD, self.BOARDCOMP, self.VERSUSBOARD, self.PLAYER2, self.HIDEN1, self.HIDEN2)
+                    self.first()
+                    self.menu()
                     return guessrow
                     break
                 else:
-                    self.SOUNDINVALID.play()
-                    print ""
-                    print chr(27) + "[0;91m" + "     ✘ Please enter numbers in the range of 1 - 10." + chr(27) + "[0m"
-            except:
-                self.BADDATA.play()
-                print ""
-                print chr(27) + "[0;91m" + "     ✘ Please enter numbers!" + chr(27) + "[0m"
+                    try:
+                        guessrow = int(guessrow)
+                        if guessrow >= 1 and guessrow <= 10:
+                            self.OPTIONSOUND.play()
+                            guessrow -= 1
+                            return guessrow
+                            break
+                        else:
+                            self.SOUNDINVALID.play()
+                            print ""
+                            print chr(27) + "[0;91m" + "     ✘ Please enter numbers in the range of 1 - 10." + chr(27) + "[0m"
+                    except:
+                        self.BADDATA.play()
+                        print ""
+                        print chr(27) + "[0;91m" + "     ✘ Please enter numbers!" + chr(27) + "[0m"
 
 
 
     def entering_number_col(self):
         """Allows the user to enter a column number."""
         while True:
-            try:
-                print ""
-                guesscol = int(raw_input("   >Enter column: "))
-                if guesscol >= 1 and guesscol <=10:
-                    self.OPTIONSOUND.play()
-                    guesscol -= 1
-                    return guesscol
-                    break
-                else:
-                    self.SOUNDINVALID.play()
+            print ""
+            guesscol = raw_input("   >Enter column: ")
+            if guesscol == "exit":
+                self.clear()
+                self.limpiar(self.USERBOARD, self.BOARDCOMP, self.VERSUSBOARD, self.PLAYER2, self.HIDEN1, self.HIDEN2)
+                self.first()
+                self.menu()
+                self.exit()
+                return guesscol
+                break
+            else:
+                try:
+                    guesscol = int(guesscol)
+                    if guesscol >= 1 and guesscol <= 10:
+                        self.OPTIONSOUND.play()
+                        guesscol -= 1
+                        return guesscol
+                        break
+                    else:
+                        self.SOUNDINVALID.play()
+                        print ""
+                        print chr(27) + "[0;91m" + "     ✘ Please enter numbers in the range of 1 - 10." + chr(27) + "[0m"
+                except:
+                    self.BADDATA.play()
                     print ""
-                    print chr(27) + "[0;91m" + "     ✘ Please enter numbers in the range of 1 - 10." + chr(27) + "[0m"
-            except:
-                self.BADDATA.play()
-                print ""
-                print chr(27) + "[0;91m" + "     ✘ Please enter numbers!" + chr(27) + "[0m"
+                    print chr(27) + "[0;91m" + "     ✘ Please enter numbers!" + chr(27) + "[0m"
+
 
 
     def statistics(self, board):
@@ -489,7 +515,7 @@ class battleship(object):
 
 
     def hit_boat_computer(self, board, hitrow, hitcol):
-        """f"""
+        """This function checks if the computer has impacted."""
         if "|   " in board[hitrow][hitcol]:
             board[hitrow][hitcol] = "| o "
             print "                  Poor shooting!"
@@ -571,6 +597,7 @@ class battleship(object):
 
 
     def hit_boat(self, hiden_board, board, hitrow, hitcol):
+        """This function checks the user impacts."""
         if "|   " in hiden_board[hitrow][hitcol]:
             hiden_board[hitrow][hitcol] = "| o "
             board[hitrow][hitcol] = "| o "
@@ -677,6 +704,7 @@ class battleship(object):
 
 
     def new_game_single(self):
+        """This function asks the user to play again."""
         while True:
             playAgain = raw_input("    Play again? y/n ")
             playAgain = playAgain.lower()
@@ -698,6 +726,7 @@ class battleship(object):
 
 
     def new_game_multiplayer(self):
+        """This function asks the user to play a multiplayer secion again."""
         while True:
             new_game = raw_input("    Play again? y/n ")
             new_game = new_game.lower()
@@ -719,6 +748,7 @@ class battleship(object):
 
 
     def limpiar(self, board1, board2, board3, board4, board5, board6):
+        """This function cleans the lists where the boards are contained."""
         length_board1 = len(board1)
         length_board2 = len(board2)
         length_board3 = len(board3)
@@ -914,10 +944,12 @@ class battleship(object):
 
 
     def method_exists(self, option):
-        dici = {"1": self.single_secion,  "2": self.multiplayer, "3": self.instruccions_single, "4": self.exit}
+        dici = {"1": self.single_secion,  "2": self.multiplayer, "3": self.instruccions_single}
         count = 0
 
-        if option in dici:
+        if option == "4":
+            return "exit"
+        elif option in dici:
             self.clear()
             return dici[option]
         else:
@@ -933,45 +965,65 @@ class battleship(object):
         while cosa == False:
             option = raw_input(   ">* Choose an option: ")
             cosa = self.method_exists(option)
-            cosa()
-            break
+            if cosa != "exit":
+                cosa()
+                break
+            else:
+                sys.exit(0)
+                self.exit()
+                break
 
 
 
     def instruccions_single(self):
-        print """
+        print chr(27) + "[0;93m" + """
 
             ____           __                  __  _                     
            /  _/___  _____/ /________  _______/ /_(_)___  ____  _____    
            / // __ \/ ___/ __/ ___/ / / / ___/ __/ / __ \/ __ \/ ___/    
          _/ // / / (__  ) /_/ /  / /_/ / /__/ /_/ / /_/ / / / (__  )     
         /___/_/ /_/____/\__/_/   \__,_/\___/\__/_/\____/_/ /_/____/
+""" + chr(27) + "[0m"
 
+        time.sleep(0.1)
+        print "        Before the battle you should place the ships on the board."
+        time.sleep(0.1)
+        print "        The measures of ships are:"
+        time.sleep(0.1)
 
-        Before the battle you should place the ships on the board.
-        The measures of ships are:
-
-                Ship                          Measure
-
-                Aircraft......................5 squares
-                Battleship....................4 squares
-                Frigate.......................3 squares
-                Submarine.....................3 squares
-                Minesweeper...................2 squares
-     
-     Enter the row number and column number where you want to place your boat.
-     You must enter numbers in the range of 1 - 10.
-     
-     You must enter the orientation of your boat. It can be vertical or horizontal. 
-     You should enter the letter "V" for vertical, or the letter "H" for horizontal.
-     
-     When you hit the enemy ship you get one more chance.
-     When the enemy hit your ship, the enemy gets one more chance.
-
-     The game ends when all boats of any opponent, are destroyed.
-     
-    """
-        raw_input("    Press enter to return to Main Menu... ")
+        print chr(27) + "[1;91m" + """
+                Ship                          Measure """ + chr(27) + "[0m"
+        time.sleep(0.1)
+        print chr(27) + "[3;92m" + """
+               Aircraft......................5 squares"""
+        time.sleep(0.1)
+        print "               Battleship....................4 squares"
+        time.sleep(0.1)
+        print "               Frigate.......................3 squares"
+        time.sleep(0.1)
+        print "               Submarine.....................3 squares"
+        time.sleep(0.1)
+        print "               Minesweeper...................2 squares" + chr(27) + "[0m"
+        print ""
+        time.sleep(0.1)
+        print "        Enter the row number and column number where you want to place your boat."
+        time.sleep(0.1)
+        print "        You must enter numbers in the range of 1 - 10."
+        print ""
+        time.sleep(0.1)
+        print "        You must enter the orientation of your boat. It can be vertical or horizontal."
+        time.sleep(0.1)
+        print "        You should enter the letter 'V' for vertical, or the letter 'H' for horizontal."
+        print ""
+        time.sleep(0.1)
+        print "        When you hit the enemy ship you get one more chance."
+        time.sleep(0.1)
+        print "        When the enemy hit your ship, the enemy gets one more chance."
+        time.sleep(0.1)
+        print "        The game ends when all boats of any opponent, are destroyed."
+        time.sleep(0.1)
+        print ""
+        raw_input(chr(27) + "[3;98m" + "       >Press enter to return to Main Menu... " + chr(27) + "[0m")
         self.clear()
         self.first()
         self.menu()
@@ -987,4 +1039,3 @@ class battleship(object):
         self.menu()
 
 jugar = battleship()
-jugar.arranque()
