@@ -9,17 +9,17 @@ import sys
 
 pygame.mixer.init()
 
-class battleship(object):
-    """docstring for ClassName"""
+class Battleship(object):
+    """Class Battleship game."""
     pygame.mixer.music.load("Skyward Fire (Original Version).mp3")
 
     def __init__(self):
         self.BOARDCOMP = [] #This list stores the data of the computer board.
         self.USERBOARD = [] #This list stores the data of the user board.
-        self.VERSUSBOARD = []
-        self.PLAYER2 = []
-        self.HIDEN1 = []
-        self.HIDEN2 = []
+        self.VERSUSBOARD = [] #Hides the computer's board
+        self.PLAYER2 = [] #This list stores the data of the player2 board.
+        self.HIDEN1 = [] #Hides the pleyer's 1 board
+        self.HIDEN2 = [] #Hides the pleyer's 2 board
     
         self.SOUNDINVALID = pygame.mixer.Sound("SD_MENU_WRONG_12.wav")
         self.OPTIONSOUND = pygame.mixer.Sound("SD_MENU_SELECT_4.wav")
@@ -46,12 +46,11 @@ class battleship(object):
         self.VICTORY = pygame.mixer.Sound("Winner.wav")
 
         self.COMPUTER_INSULTS = ["You like that?", "That had to hurt...", "Boom!", "Burn, baby!", "Squeal boy, squeal!", "Toasted!", "Loser!", "Eat that!", "Oh yeah!"]
-        self.COMPUTER_SUFFER = ["Man Down!", "I'm under heavy attack!","I need some backup!"]
 
 
 
-        self.SHIPS = {"aircraft": 5, "battleship": 4, "frigate": 3, "submarine": 3, "minesweeper": 2}
-        self.CHARACTER = {"aircraft": "| A ", "battleship": "| B ", "frigate": "| F ", "submarine": "| S ", "minesweeper": "| M "}
+        self.SHIPS = {"aircraft": 5, "battleship": 4, "frigate": 3, "submarine": 3, "minesweeper": 2} #stores the size of ships
+        self.CHARACTER = {"aircraft": "| A ", "battleship": "| B ", "frigate": "| F ", "submarine": "| S ", "minesweeper": "| M "} #stores the characters of ships
 
 
 
@@ -59,7 +58,7 @@ class battleship(object):
 
 
     def create(self, board):
-        """This function adds several lists at the board list, this will serve to place the boats later."""
+        """This method adds several lists at the board list, this will serve to place the boats later."""
         for var in range(0, 10):
             board.append(["|   "] * 10),
 
@@ -80,18 +79,18 @@ class battleship(object):
 
 
     def random_row(self, board):
-        """This function generates a random number to locate the row number on the game board."""
+        """This method generates a random number to locate the row number on the game board."""
         return random.randint(0, len(board) - 1)
 
 
 
     def random_col(self, board):
-        """This function generates a random number to locate the column number on the game board."""
+        """This method generates a random number to locate the column number on the game board."""
         return random.randint(0, len(board[0]) - 1)
 
 
     def user_decision(self, board):
-        """This function allows the user to decide the position of their ships."""
+        """This method allows the user to decide the position of their ships."""
         self.create(board)
         self.print_tablero(board)
         for boat in self.SHIPS: #Choose one by one the boats in the dictionary to be placed.
@@ -127,7 +126,7 @@ class battleship(object):
 
 
     def no_intersection_horizontal(self, board, dict_ship, boat, row_x, col_y):
-        """This function checks that the boats are not placed on other boats."""
+        """This method checks that the boats are not placed on other boats."""
         count = 0 #This variable stores the count of the string "|   ".
 
         try:
@@ -153,7 +152,7 @@ class battleship(object):
 
 
     def no_exist_vertical(self, board, dict_ship, boat, row_x, col_y):
-        """This function checks that the boats are not placed on other boats in vertical position."""
+        """This method checks that the boats are not placed on other boats in vertical position."""
         count = 0 #This variable stores the count of the string "|   ".
 
         try:
@@ -196,7 +195,7 @@ class battleship(object):
 
 
     def placing_ship_vertical(self, board, coordx, coordy, boat):
-        """This function allows you to place the boats upright."""
+        """This method allows you to place the boats upright."""
         try:
             for intento in range(self.SHIPS[boat]):
                 board[coordx + intento][coordy] = self.CHARACTER[boat]
@@ -213,7 +212,7 @@ class battleship(object):
 
 
     def user_vertical_horizontal(self):
-        """This function allows the user to choose the position of the boat."""
+        """This method allows the user to choose the position of the boat."""
         message_text = chr(27) + "[0;95m" + """
        //*Select the position of your boat.
        //*Press 'v' to place boat vertically.
@@ -225,10 +224,10 @@ class battleship(object):
             decisionuser = raw_input("   >* v/h: ")
             decision_low = decisionuser.lower()
             if decision_low == "h":
-                return "h" #If the user chooses horizontal, returns h, and another function is responsible for placing the ship.
+                return "h" #If the user chooses horizontal, returns h, and another method is responsible for placing the ship.
                 break
             elif decision_low == "v":
-                return "v" #If the user chooses vertical, returns v, and another function is responsible for placing the ship.
+                return "v" #If the user chooses vertical, returns v, and another method is responsible for placing the ship.
                 break
             else:
                 self.BADDATA.play()
@@ -239,7 +238,7 @@ class battleship(object):
 
 
     def computer_ships(self):
-        """This function places the computer's ships  randomly."""
+        """This method places the computer's ships  randomly."""
         self.create(self.BOARDCOMP)
         for boat in self.SHIPS: #Choose one by one the boats in the dictionary to be placed.
             condicion = False
@@ -504,6 +503,16 @@ class battleship(object):
         return view_board
 
 
+    def game_multiplayer_mass(self, hiden_board, show_board):
+        """allows the user to guess where are the enemy ships in a multiplayer 'weapons of mass destruction' session."""
+        self.print_tablero(show_board)
+        self.statistics(hiden_board)
+        adivina_row = self.entering_number_row()
+        adivina_col = self.entering_number_col()
+        self.clear()
+        view_board = self.hit_boat_mass(hiden_board, show_board, adivina_row, adivina_col)
+        return view_board
+
     def game_alone_massive(self):
         """allows the user to guess where are the enemy ships. It is used in the mode of weapons of mass destruction."""
         self.print_tablero(self.VERSUSBOARD)
@@ -579,8 +588,32 @@ class battleship(object):
                 destruction = self.count_damage(self.USERBOARD)
 
 
+    def turnos_multiplayer_mass(self):
+        """Manage shifts for a multi player session. It is used in a 'weapons of mass destruction' session"""
+        turn = 0
+        destruction = False
+        while destruction == False:
+            if turn == 0:
+                self.clear()
+                print "                  Shoot Player 1"
+                print ""
+                print ""
+                print ""
+                turn = self.game_multiplayer_mass(self.PLAYER2, self.HIDEN2)
+                destruction = self.count_damage(self.PLAYER2)
+            elif turn == 1:
+                self.clear()
+                print "                  Shoot Player 2"
+                print ""
+                print ""
+                print ""
+                turn = self.game_multiplayer_mass(self.USERBOARD, self.HIDEN1)
+                destruction = self.count_damage(self.USERBOARD)
+
+
+
     def turnos_mass(self):
-        """Manage shifts for a single player session. It is used in the mode of weapons of mass destruction."""
+        """Manage shifts for a single player session. It is used in the mode of 'weapons of mass destruction'."""
         self.create(self.VERSUSBOARD)
         turn = 0
         destruction = False
@@ -605,6 +638,7 @@ class battleship(object):
 
 
     def massive_impact(self, hiden_board, board, hitrow, hitcol):
+        """Checks the characters on the given position and replaces it for the character  of shooting along the entire list. WMD mode"""
         count = 0
 
         if "| A " in hiden_board[hitrow][hitcol]:
@@ -651,6 +685,7 @@ class battleship(object):
 
 
     def massive_impact_comp(self, board, hitrow, hitcol):
+        """Checks the characters on the given position and replaces it  for the character  of shooting along the entire list. It is used by the computer. WMD mode"""
         count = 0
 
         if "| A " in board[hitrow][hitcol]:
@@ -691,7 +726,7 @@ class battleship(object):
 
 
     def hit_boat(self, hiden_board, board, hitrow, hitcol):
-        """This function checks the user impacts."""
+        """This method checks the user impacts."""
         if "|   " in hiden_board[hitrow][hitcol]:
             hiden_board[hitrow][hitcol] = "| o "
             board[hitrow][hitcol] = "| o "
@@ -706,7 +741,7 @@ class battleship(object):
             print ""
             print "                  Poor shooting!"
             print ""
-            self.print_tablero(hiden_board)
+            self.print_tablero(board)
             self.statistics(hiden_board)
             print ""
             print "      You failed"
@@ -796,8 +831,9 @@ class battleship(object):
 
 
     def hit_boat_mass(self, hiden_board, board, hitrow, hitcol):
+        """This method checks the user impacts. It is used in a 'mass weapon destruction' session."""
         if "|   " in hiden_board[hitrow][hitcol]:
-            hiden_board[hitrow][hitcol] = "| o "
+            hiden_board[hitrow][hitcol] = "| o " #These characters are written when the user fails.
             board[hitrow][hitcol] = "| o "
             self.clear()
             if hiden_board == self.PLAYER2:
@@ -810,7 +846,7 @@ class battleship(object):
             print ""
             print "                  Poor shooting!"
             print ""
-            self.print_tablero(hiden_board)
+            self.print_tablero(board)
             self.statistics(hiden_board)
             print ""
             print "      You failed"
@@ -901,7 +937,7 @@ class battleship(object):
 
 
     def hit_boat_computer(self, board, hitrow, hitcol):
-        """This function checks if the computer has impacted."""
+        """This method checks if the computer has impacted."""
         if "|   " in board[hitrow][hitcol]:
             board[hitrow][hitcol] = "| o "
             print "                  Poor shooting!"
@@ -936,7 +972,7 @@ class battleship(object):
 
 
     def hit_boat_computer_mwd(self, board, hitrow, hitcol):
-        """This function checks if the computer has impacted."""
+        """This method checks if the computer has impacted."""
         if "|   " in board[hitrow][hitcol]:
             board[hitrow][hitcol] = "| o "
             print "                  Poor shooting!"
@@ -971,7 +1007,7 @@ class battleship(object):
 
 
     def new_game_single(self):
-        """This function asks the user to play again."""
+        """This method asks the user to play again."""
         while True:
             playAgain = raw_input("    Play again? y/n ")
             playAgain = playAgain.lower()
@@ -993,7 +1029,7 @@ class battleship(object):
 
 
     def new_game_single_wmd(self):
-        """This function asks the user to play a WMD game again"""
+        """This method asks the user to play a WMD game again"""
         while True:
             playAgain = raw_input("    Play again? y/n ")
             playAgain = playAgain.lower()
@@ -1016,14 +1052,35 @@ class battleship(object):
 
 
     def new_game_multiplayer(self):
-        """This function asks the user to play a multiplayer secion again."""
+        """This method asks the user to play a multiplayer secion again."""
         while True:
             new_game = raw_input("    Play again? y/n ")
             new_game = new_game.lower()
             if new_game == "y" or new_game == "yes":
                 selfself.limpiar(self.USERBOARD, self.BOARDCOMP, self.VERSUSBOARD, self.PLAYER2, self.HIDEN1, self.HIDEN2)
                 self.clear()
-                multiplayer()
+                self.multiplayer()
+                break
+            elif new_game == "n" or new_game == "no" or new_game == "not":
+                self.limpiar(self.USERBOARD, self.BOARDCOMP, self.VERSUSBOARD, self.PLAYER2, self.HIDEN1, self.HIDEN2)
+                self.clear()
+                self.first()
+                self.menu()
+                break
+            else:
+                print ""
+                print chr(27) + "[0;91m" + "   ✘ Please enter 'y' or 'n' " + chr(27) + "[0m"
+
+
+    def new_game_multiplayer_mass(self):
+        """This method asks the user to play a multiplayer 'weapons of mass destruction' secion again."""
+        while True:
+            new_game = raw_input("    Play again? y/n ")
+            new_game = new_game.lower()
+            if new_game == "y" or new_game == "yes":
+                selfself.limpiar(self.USERBOARD, self.BOARDCOMP, self.VERSUSBOARD, self.PLAYER2, self.HIDEN1, self.HIDEN2)
+                self.clear()
+                self.multiplayer_wmd()
                 break
             elif new_game == "n" or new_game == "no" or new_game == "not":
                 self.limpiar(self.USERBOARD, self.BOARDCOMP, self.VERSUSBOARD, self.PLAYER2, self.HIDEN1, self.HIDEN2)
@@ -1037,6 +1094,7 @@ class battleship(object):
 
 
     def game_mode(self):
+        """Asks the type of game that the user wishes to play."""
         print """
 
 """
@@ -1059,8 +1117,34 @@ class battleship(object):
                 print chr(27) + "[0;91m" + "   ✘ Please enter '1' or '2' " + chr(27) + "[0m"
 
 
+    def game_mode_multiplayer(self):
+        """Asks the type of game that the user wishes to play in a multiplayer game"""
+        print """
+
+"""
+        while True:
+            print "    Press 1 to play in Classic mode."
+            print "    Press 2 to play the WMD mode."
+            print ""
+            desicion = raw_input(    "> Choose an option: ")
+            desicion = desicion.lower()
+            if desicion == "1":
+                self.clear()
+                self.multiplayer()
+                break
+            elif desicion == "2":
+                self.clear()
+                self.multiplayer_wmd()
+                break
+            else:
+                print ""
+                print chr(27) + "[0;91m" + "   ✘ Please enter '1' or '2' " + chr(27) + "[0m"
+
+
+
+
     def limpiar(self, board1, board2, board3, board4, board5, board6):
-        """This function cleans the lists where the boards are contained."""
+        """This method cleans the lists where the boards are contained."""
         length_board1 = len(board1)
         length_board2 = len(board2)
         length_board3 = len(board3)
@@ -1095,6 +1179,7 @@ class battleship(object):
 
 
     def multiplayer(self):
+        """methods used in a multiplayer game."""
         self.loading()
         print ""
         print ""
@@ -1133,6 +1218,7 @@ class battleship(object):
 
 
     def single_secion(self):
+        """methods used in a sigle game."""
         print """
                  
                  
@@ -1160,7 +1246,47 @@ class battleship(object):
         pass
 
 
+    def multiplayer_wmd(self):
+        """methods used in a multiplayer game MWD."""
+        self.loading()
+        print ""
+        print ""
+        print "          Player 1 places your ships"
+        print ""
+        raw_input("          Press enter to continue...")
+        self.clear()
+        print "     It's time to deploy your ships."
+        print "     Enter the coordinates."
+        self.user_decision(self.USERBOARD)
+        self.create(self.HIDEN1)
+        print ""
+        print "         All ships in position."
+        raw_input("         Press enter to continue...")
+        self.clear()
+        print ""
+        print "          Player 2 places your ships"
+        print ""
+        raw_input("         Press enter to continue...")
+        self.clear()
+        print "     It's time to deploy your ships."
+        print "     Enter the coordinates."
+        self.user_decision(self.PLAYER2)
+        self.create(self.HIDEN2)
+        print ""
+        print "         All ships in position."
+        print "         It's time to fight!"
+        print ""
+        raw_input("         Press enter to continue...")
+        self.clear()
+        self.atacar_image()
+        time.sleep(2)
+        self.clear()
+        self.turnos_multiplayer_mass()
+        self.new_game_multiplayer_mass()
+
+
     def mass_mode_single(self):
+        """methods used in a singleplayer game MWD."""
         print """
                  
                  
@@ -1187,7 +1313,7 @@ class battleship(object):
 
 
     def first(self):
-        """This is a function that displays the name of the game and the menu instructions"""
+        """This is a method that displays the name of the game and the menu instructions"""
         print chr(27) + "[0;93m" + u""" 
     ██████╗**█████╗*████████╗████████╗██╗*****███████╗███████╗██╗**██╗██╗██████╗*██╗
     ██╔══██╗██╔══██╗╚══██╔══╝╚══██╔══╝██║*****██╔════╝██╔════╝██║**██║██║██╔══██╗██║
@@ -1257,7 +1383,7 @@ class battleship(object):
 
 
     def loading(self):
-        """Function that displays a load message at the start of the game."""
+        """methodet that displays a load message at the start of the game."""
         print """
                                                            
                                                            
@@ -1269,7 +1395,7 @@ class battleship(object):
 
 
     def clear(self):
-        """This function clears the screen at the terminal. Works on windows and ubuntu."""
+        """This method clears the screen at the terminal. Works on windows and ubuntu."""
         if os.name == "posix":
             os.system("reset")
         elif os.name == "nt":
@@ -1281,9 +1407,9 @@ class battleship(object):
         os.system("exit")
 
 
-
     def method_exists(self, option):
-        dici = {"1": self.game_mode,  "2": self.multiplayer, "3": self.instruccions_single}
+        """contains the methods of different game types, and returns it to be used in the menu"""
+        dici = {"1": self.game_mode,  "2": self.game_mode_multiplayer, "3": self.instruccions_single}
         count = 0
 
         if option == "4":
@@ -1292,6 +1418,7 @@ class battleship(object):
             self.clear()
             return dici[option]
         else:
+            self.BADDATA.play()
             print ""
             print chr(27) + "[0;91m" + "   ✘ Please enter NUMBERS from 1 to 4." + chr(27) + "[0m"
             print ""
@@ -1300,12 +1427,13 @@ class battleship(object):
 
 
     def menu(self):
-        cosa = False
-        while cosa == False:
+        """Main menu"""
+        condition = False
+        while condition == False:
             option = raw_input(   ">* Choose an option: ")
-            cosa = self.method_exists(option)
-            if cosa != "exit":
-                cosa()
+            methods = self.method_exists(option)
+            if methods != "exit":
+                methods()
                 break
             else:
                 sys.exit(0)
@@ -1315,6 +1443,7 @@ class battleship(object):
 
 
     def instruccions_single(self):
+        """Game instructions."""
         print chr(27) + "[0;93m" + """
             ____           __                  __  _                     
            /  _/___  _____/ /________  _______/ /_(_)___  ____  _____    
@@ -1330,7 +1459,7 @@ class battleship(object):
         time.sleep(0.1)
 
         print chr(27) + "[1;91m" + """
-                Ship                          Measure """ + chr(27) + "[0m"
+                Ship                          Size """ + chr(27) + "[0m"
         time.sleep(0.1)
         print chr(27) + "[3;92m" + """
                Aircraft......................5 squares"""
@@ -1368,6 +1497,7 @@ class battleship(object):
 
 
     def arranque(self):
+        """methods that run at startup"""
         self.clear()
         self.image_skull()
         self.loading()
@@ -1376,5 +1506,5 @@ class battleship(object):
         self.first()
         self.menu()
 
-jugar = battleship()
+jugar = Battleship()
 jugar.arranque()
