@@ -504,6 +504,16 @@ class battleship(object):
         return view_board
 
 
+    def game_alone_massive(self):
+        """allows the user to guess where are the enemy ships. It is used in the mode of weapons of mass destruction."""
+        self.print_tablero(self.VERSUSBOARD)
+        self.statistics(self.BOARDCOMP)
+        adivina_row = self.entering_number_row()
+        adivina_col = self.entering_number_col()
+        self.clear()
+        view_board = self.hit_boat_mass(self.BOARDCOMP, self.VERSUSBOARD, adivina_row, adivina_col)
+        return view_board
+
 
     def computer_turn(self):
         """The computer tries to guess where are the boats."""
@@ -514,39 +524,13 @@ class battleship(object):
 
 
 
-    def hit_boat_computer(self, board, hitrow, hitcol):
-        """This function checks if the computer has impacted."""
-        if "|   " in board[hitrow][hitcol]:
-            board[hitrow][hitcol] = "| o "
-            print "                  Poor shooting!"
-            print ""
-            self.print_tablero(board)
-            self.statistics_user(board)
-            print "    The enemy has failed."
-            print "    Now it's your turn."
-            raw_input("    Press enter...")
-            return 0
-        else:
-            if "| o " in board[hitrow][hitcol]:
-                return 1
-            elif "| x " in board[hitrow][hitcol]:
-                return 1
-            else:
-                self.EXPlOSION.play()
-                board[hitrow][hitcol] = "| x "
-                print "                  Impact!"
-                print ""
-                self.print_tablero(board)
-                insulto = random.choice(self.COMPUTER_INSULTS)
-                print ""
-                print "   Enemy message: " + str(insulto)
-                print ""
-                self.statistics_user(board)
-                print "   The enemy has impacted your boat."
-                time.sleep(0.4)
-                self.TAUNTS[insulto].play()
-                raw_input("   Press enter...")
-                return 1
+    def computer_turn_mass(self):
+        """The computer tries to guess where are the boats. MWD mode"""
+        hitrow = self.random_row(self.USERBOARD)
+        hitcol = self.random_col(self.USERBOARD)
+        view_board = self.hit_boat_computer_mwd(self.USERBOARD, hitrow, hitcol)
+        return view_board
+
 
 
     def turnos(self):
@@ -594,6 +578,116 @@ class battleship(object):
                 turn = self.game_multiplayer(self.USERBOARD, self.HIDEN1)
                 destruction = self.count_damage(self.USERBOARD)
 
+
+    def turnos_mass(self):
+        """Manage shifts for a single player session. It is used in the mode of weapons of mass destruction."""
+        self.create(self.VERSUSBOARD)
+        turn = 0
+        destruction = False
+        while destruction == False:
+            if turn == 0:
+                self.clear()
+                print "                  Your turn"
+                print ""
+                print ""
+                print ""
+                turn = self.game_alone_massive()
+                destruction = self.count_damage(self.BOARDCOMP)
+            elif turn == 1:
+                self.clear()
+                print "                  Enemy's turn"
+                print ""
+                turn = self.computer_turn_mass()
+                destruction = self.count_damage_comp(self.USERBOARD)
+
+
+
+
+
+    def massive_impact(self, hiden_board, board, hitrow, hitcol):
+        count = 0
+
+        if "| A " in hiden_board[hitrow][hitcol]:
+            while count != 10:
+                for coordinates in range(10):
+                    if "| A " in hiden_board[count][coordinates]:
+                        hiden_board[count][coordinates] = "| x "
+                        board[count][coordinates] = "| x "
+                count += 1
+
+        elif "| B " in hiden_board[hitrow][hitcol]:
+            while count != 10:
+                for coordinates in range(10):
+                    if "| B " in hiden_board[count][coordinates]:
+                        hiden_board[count][coordinates] = "| x "
+                        board[count][coordinates] = "| x "
+                count += 1
+
+        elif "| F " in hiden_board[hitrow][hitcol]:
+            while count != 10:
+                for coordinates in range(10):
+                    if "| F " in hiden_board[count][coordinates]:
+                        hiden_board[count][coordinates] = "| x "
+                        board[count][coordinates] = "| x "
+                count += 1
+
+
+        elif "| S " in hiden_board[hitrow][hitcol]:
+            while count != 10:
+                for coordinates in range(10):
+                    if "| S " in hiden_board[count][coordinates]:
+                        hiden_board[count][coordinates] = "| x "
+                        board[count][coordinates] = "| x "
+                count += 1
+
+        elif "| M " in hiden_board[hitrow][hitcol]:
+            while count != 10:
+                for coordinates in range(10):
+                    if "| M " in hiden_board[count][coordinates]:
+                        hiden_board[count][coordinates] = "| x "
+                        board[count][coordinates] = "| x "
+                count += 1
+
+
+
+    def massive_impact_comp(self, board, hitrow, hitcol):
+        count = 0
+
+        if "| A " in board[hitrow][hitcol]:
+            while count != 10:
+                for coordinates in range(10):
+                    if "| A " in board[count][coordinates]:
+                        board[count][coordinates] = "| x "
+                count += 1
+
+        elif "| B " in board[hitrow][hitcol]:
+            while count != 10:
+                for coordinates in range(10):
+                    if "| B " in board[count][coordinates]:
+                        board[count][coordinates] = "| x "
+                count += 1
+
+        elif "| F " in board[hitrow][hitcol]:
+            while count != 10:
+                for coordinates in range(10):
+                    if "| F " in board[count][coordinates]:
+                        board[count][coordinates] = "| x "
+                count += 1
+
+
+        elif "| S " in board[hitrow][hitcol]:
+            while count != 10:
+                for coordinates in range(10):
+                    if "| S " in board[count][coordinates]:
+                        board[count][coordinates] = "| x "
+                count += 1
+
+        elif "| M " in board[hitrow][hitcol]:
+            while count != 10:
+                for coordinates in range(10):
+                    if "| M " in board[count][coordinates]:
+                        board[count][coordinates] = "| x "
+                count += 1
 
 
     def hit_boat(self, hiden_board, board, hitrow, hitcol):
@@ -701,6 +795,179 @@ class battleship(object):
                     return 0
 
 
+    def hit_boat_mass(self, hiden_board, board, hitrow, hitcol):
+        if "|   " in hiden_board[hitrow][hitcol]:
+            hiden_board[hitrow][hitcol] = "| o "
+            board[hitrow][hitcol] = "| o "
+            self.clear()
+            if hiden_board == self.PLAYER2:
+                print "                  Shoot Player 1"
+            elif hiden_board == self.USERBOARD:
+                print "                  Shoot Player 2"
+            else:
+                print "                  Your Turn"
+
+            print ""
+            print "                  Poor shooting!"
+            print ""
+            self.print_tablero(hiden_board)
+            self.statistics(hiden_board)
+            print ""
+            print "      You failed"
+
+            if hiden_board == self.PLAYER2:
+                print "      It's turn of player 2"
+            elif hiden_board == self.USERBOARD:
+                print "      It's turn of player 1"
+            else:
+                print "      It's the enemy's turn!"
+
+            raw_input("      Press enter...")
+
+            if hiden_board == self.USERBOARD:
+                return 0
+            else:
+                return 1
+
+        else:
+            if "| o " in hiden_board[hitrow][hitcol]:
+
+                if hiden_board == self.PLAYER2:
+                    print "                  Shoot Player 1"
+                elif hiden_board == self.USERBOARD:
+                    print "                  Shoot Player 2"
+                else:
+                    print "                  Your Turn"
+                print ""
+                print "                    Not again!"
+                print ""
+                self.print_tablero(board)
+                self.statistics(hiden_board)
+                print ""
+                print "   You've already shot that position. Try again."
+                raw_input("   Press enter and try again...")
+
+                if hiden_board == self.USERBOARD:
+                    return 1
+                else:
+                    return 0
+
+            elif "| x " in hiden_board[hitrow][hitcol]:
+
+                if hiden_board == self.PLAYER2:
+                    print "                  Shoot Player 1"
+                elif hiden_board == self.USERBOARD:
+                    print "                  Shoot Player 2"
+                else:
+                    print "                  Your Turn"
+
+                print ""
+                print "                    Not again!"
+                print ""
+                self.print_tablero(board)
+                self.statistics(hiden_board)
+                print ""
+                print "   You've already shot that position. Try again."
+                raw_input("   Press enter and try again...")
+                if hiden_board == self.USERBOARD:
+                    return 1
+                else:
+                    return 0
+            else:
+                self.IMPACT.play()
+                self.massive_impact(hiden_board, board, hitrow, hitcol)
+
+                if hiden_board == self.PLAYER2:
+                    print "                  Shoot Player 1"
+                elif hiden_board == self.USERBOARD:
+                    print "                  Shoot Player 2"
+                else:
+                    print "                  Your Turn"
+
+                print ""
+                print "                  Impact!"
+                print ""
+                self.print_tablero(board)
+                self.statistics(hiden_board)
+                print ""
+                print "   You've hit the enemy ship!"
+                raw_input("   Press enter...")
+                if hiden_board == self.USERBOARD:
+                    return 1
+                else:
+                    return 0
+
+        pass
+
+
+    def hit_boat_computer(self, board, hitrow, hitcol):
+        """This function checks if the computer has impacted."""
+        if "|   " in board[hitrow][hitcol]:
+            board[hitrow][hitcol] = "| o "
+            print "                  Poor shooting!"
+            print ""
+            self.print_tablero(board)
+            self.statistics_user(board)
+            print "    The enemy has failed."
+            print "    Now it's your turn."
+            raw_input("    Press enter...")
+            return 0
+        else:
+            if "| o " in board[hitrow][hitcol]:
+                return 1
+            elif "| x " in board[hitrow][hitcol]:
+                return 1
+            else:
+                self.EXPlOSION.play()
+                board[hitrow][hitcol] = "| x "
+                print "                  Impact!"
+                print ""
+                self.print_tablero(board)
+                insulto = random.choice(self.COMPUTER_INSULTS)
+                print ""
+                print "   Enemy message: " + str(insulto)
+                print ""
+                self.statistics_user(board)
+                print "   The enemy has impacted your boat."
+                time.sleep(0.4)
+                self.TAUNTS[insulto].play()
+                raw_input("   Press enter...")
+                return 1
+
+
+    def hit_boat_computer_mwd(self, board, hitrow, hitcol):
+        """This function checks if the computer has impacted."""
+        if "|   " in board[hitrow][hitcol]:
+            board[hitrow][hitcol] = "| o "
+            print "                  Poor shooting!"
+            print ""
+            self.print_tablero(board)
+            self.statistics_user(board)
+            print "    The enemy has failed."
+            print "    Now it's your turn."
+            raw_input("    Press enter...")
+            return 0
+        else:
+            if "| o " in board[hitrow][hitcol]:
+                return 1
+            elif "| x " in board[hitrow][hitcol]:
+                return 1
+            else:
+                self.EXPlOSION.play()
+                self.massive_impact_comp(board, hitrow, hitcol)
+                print "                  Impact!"
+                print ""
+                self.print_tablero(board)
+                insulto = random.choice(self.COMPUTER_INSULTS)
+                print ""
+                print "   Enemy message: " + str(insulto)
+                print ""
+                self.statistics_user(board)
+                print "   The enemy has impacted your boat."
+                time.sleep(0.4)
+                self.TAUNTS[insulto].play()
+                raw_input("   Press enter...")
+                return 1
 
 
     def new_game_single(self):
@@ -725,6 +992,29 @@ class battleship(object):
 
 
 
+    def new_game_single_wmd(self):
+        """This function asks the user to play a WMD game again"""
+        while True:
+            playAgain = raw_input("    Play again? y/n ")
+            playAgain = playAgain.lower()
+            if playAgain == "y" or playAgain == "yes":
+                self.limpiar(self.USERBOARD, self.BOARDCOMP, self.VERSUSBOARD, self.PLAYER2, self.HIDEN1, self.HIDEN2)
+                self.clear()
+                self.mass_mode_single()
+                break
+            elif playAgain == "n" or playAgain == "no" or playAgain == "not":
+                self.limpiar(self.USERBOARD, self.BOARDCOMP, self.VERSUSBOARD, self.PLAYER2, self.HIDEN1, self.HIDEN2)
+                self.clear()
+                self.first()
+                self.menu()
+                break
+            else:
+                print ""
+                print chr(27) + "[0;91m" + "   ✘ Please enter 'y' or 'n' " + chr(27) + "[0m"
+
+
+
+
     def new_game_multiplayer(self):
         """This function asks the user to play a multiplayer secion again."""
         while True:
@@ -745,6 +1035,28 @@ class battleship(object):
                 print ""
                 print chr(27) + "[0;91m" + "   ✘ Please enter 'y' or 'n' " + chr(27) + "[0m"
 
+
+    def game_mode(self):
+        print """
+
+"""
+        while True:
+            print "    Press 1 to play in Classic mode."
+            print "    Press 2 to play the WMD mode."
+            print ""
+            desicion = raw_input(    "> Choose an option: ")
+            desicion = desicion.lower()
+            if desicion == "1":
+                self.clear()
+                self.single_secion()
+                break
+            elif desicion == "2":
+                self.clear()
+                self.mass_mode_single()
+                break
+            else:
+                print ""
+                print chr(27) + "[0;91m" + "   ✘ Please enter '1' or '2' " + chr(27) + "[0m"
 
 
     def limpiar(self, board1, board2, board3, board4, board5, board6):
@@ -843,8 +1155,35 @@ class battleship(object):
         time.sleep(2)
         self.turnos()
         self.new_game_single()
+        self.new_game()
 
         pass
+
+
+    def mass_mode_single(self):
+        print """
+                 
+                 
+                 
+        """
+        raw_input("         Press enter to continue...")
+        self.clear()
+        print ""
+        print "     It's time to deploy your ships."
+        print "     Enter the coordinates."
+        self.user_decision(self.USERBOARD)
+        print ""
+        print "         All ships in position."
+        print ""
+        raw_input("         Press enter to continue...")
+        self.clear()
+        self.computer_ships()
+        self.clear()
+        self.atacar_image()
+        time.sleep(2)
+        self.turnos_mass()
+        self.new_game_single_wmd()
+
 
 
     def first(self):
@@ -944,7 +1283,7 @@ class battleship(object):
 
 
     def method_exists(self, option):
-        dici = {"1": self.single_secion,  "2": self.multiplayer, "3": self.instruccions_single}
+        dici = {"1": self.game_mode,  "2": self.multiplayer, "3": self.instruccions_single}
         count = 0
 
         if option == "4":
@@ -977,7 +1316,6 @@ class battleship(object):
 
     def instruccions_single(self):
         print chr(27) + "[0;93m" + """
-
             ____           __                  __  _                     
            /  _/___  _____/ /________  _______/ /_(_)___  ____  _____    
            / // __ \/ ___/ __/ ___/ / / / ___/ __/ / __ \/ __ \/ ___/    
