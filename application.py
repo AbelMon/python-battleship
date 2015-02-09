@@ -307,7 +307,7 @@ class Battleship(object):
                 try:
                     guesscol = int(guesscol)
                     if guesscol >= 1 and guesscol <= 10:
-                        self.OPTIONSOUND.play()
+                        self.OTHERVALID.play()
                         guesscol -= 1
                         return guesscol
                         break
@@ -1023,8 +1023,10 @@ class Battleship(object):
                 self.menu()
                 break
             else:
+                self.BADDATA.play()
                 print ""
                 print chr(27) + "[0;91m" + "   ✘ Please enter 'y' or 'n' " + chr(27) + "[0m"
+                print ""
 
 
 
@@ -1045,8 +1047,10 @@ class Battleship(object):
                 self.menu()
                 break
             else:
+                self.BADDATA.play()
                 print ""
                 print chr(27) + "[0;91m" + "   ✘ Please enter 'y' or 'n' " + chr(27) + "[0m"
+                print ""
 
 
 
@@ -1068,8 +1072,10 @@ class Battleship(object):
                 self.menu()
                 break
             else:
+                self.BADDATA.play()
                 print ""
                 print chr(27) + "[0;91m" + "   ✘ Please enter 'y' or 'n' " + chr(27) + "[0m"
+                print ""
 
 
     def new_game_multiplayer_mass(self):
@@ -1089,8 +1095,10 @@ class Battleship(object):
                 self.menu()
                 break
             else:
+                self.BADDATA.play()
                 print ""
                 print chr(27) + "[0;91m" + "   ✘ Please enter 'y' or 'n' " + chr(27) + "[0m"
+                print ""
 
 
     def game_mode(self):
@@ -1180,6 +1188,7 @@ class Battleship(object):
 
     def multiplayer(self):
         """methods used in a multiplayer game."""
+        self.OPTIONSOUND.play()
         self.loading()
         print ""
         print ""
@@ -1219,6 +1228,7 @@ class Battleship(object):
 
     def single_secion(self):
         """methods used in a sigle game."""
+        self.OPTIONSOUND.play()
         print """
                  
                  
@@ -1247,6 +1257,7 @@ class Battleship(object):
 
 
     def multiplayer_wmd(self):
+        self.OPTIONSOUND.play()
         """methods used in a multiplayer game MWD."""
         self.loading()
         print ""
@@ -1287,6 +1298,7 @@ class Battleship(object):
 
     def mass_mode_single(self):
         """methods used in a singleplayer game MWD."""
+        self.OPTIONSOUND.play()
         print """
                  
                  
@@ -1416,6 +1428,7 @@ class Battleship(object):
             return "exit"
         elif option in dici:
             self.clear()
+            self.OPTIONSOUND.play()
             return dici[option]
         else:
             self.BADDATA.play()
@@ -1443,6 +1456,7 @@ class Battleship(object):
 
 
     def instruccions_single(self):
+        self.OPTIONSOUND.play()
         """Game instructions."""
         print chr(27) + "[0;93m" + """
             ____           __                  __  _                     
@@ -1453,9 +1467,9 @@ class Battleship(object):
 """ + chr(27) + "[0m"
 
         time.sleep(0.1)
-        print "        Before the battle you should place the ships on the board."
+        print "      Before the battle you should place the ships on the board."
         time.sleep(0.1)
-        print "        The measures of ships are:"
+        print "      The measures of ships are:"
         time.sleep(0.1)
 
         print chr(27) + "[1;91m" + """
@@ -1472,25 +1486,36 @@ class Battleship(object):
         time.sleep(0.1)
         print "               Minesweeper...................2 squares" + chr(27) + "[0m"
         print ""
-        time.sleep(0.1)
-        print "        Enter the row number and column number where you want to place your boat."
-        time.sleep(0.1)
-        print "        You must enter numbers in the range of 1 - 10."
+        print chr(27) + "[1;95m" + "      *Classic mode:" + chr(27) + "[0m"
         print ""
         time.sleep(0.1)
-        print "        You must enter the orientation of your boat. It can be vertical or horizontal."
+        print "      Enter the row number and column number where you want to place your boat."
         time.sleep(0.1)
-        print "        You should enter the letter 'V' for vertical, or the letter 'H' for horizontal."
+        print "      You must enter numbers in the range of 1 - 10."
         print ""
         time.sleep(0.1)
-        print "        When you hit the enemy ship you get one more chance."
+        print "      You must enter the orientation of your boat. It can be vertical or horizontal."
         time.sleep(0.1)
-        print "        When the enemy hit your ship, the enemy gets one more chance."
+        print "      You should enter the letter 'V' for vertical, or the letter 'H' for horizontal."
+        print ""
         time.sleep(0.1)
-        print "        The game ends when all boats of any opponent, are destroyed."
+        print "      When you hit the enemy ship you get one more chance."
+        time.sleep(0.1)
+        print "      When the enemy hit your ship, the enemy gets one more chance."
+        time.sleep(0.1)
+        print "      The game ends when all boats of any opponent, are destroyed."
         time.sleep(0.1)
         print ""
-        raw_input(chr(27) + "[3;98m" + "       >Press enter to return to Main Menu... " + chr(27) + "[0m")
+        print chr(27) + "[1;95m" + "      *Weapons of mass destruction mode (WMD):" + chr(27) + "[0m"
+        print ""
+        time.sleep(0.1)
+        print "      The rules are the same as classic mode."
+        time.sleep(0.1)
+        print "      The difference is that the ships are destroyed with a single shot."
+        print ""
+        time.sleep(0.1)
+        raw_input(chr(27) + "[3;98m" + "     >Press enter to return to Main Menu... " + chr(27) + "[0m")
+        self.OPTIONSOUND.play()
         self.clear()
         self.first()
         self.menu()
