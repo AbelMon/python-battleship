@@ -1061,7 +1061,7 @@ class Battleship(object):
             new_game = raw_input("    Play again? y/n ")
             new_game = new_game.lower()
             if new_game == "y" or new_game == "yes":
-                selfself.limpiar(self.USERBOARD, self.BOARDCOMP, self.VERSUSBOARD, self.PLAYER2, self.HIDEN1, self.HIDEN2)
+                self.limpiar(self.USERBOARD, self.BOARDCOMP, self.VERSUSBOARD, self.PLAYER2, self.HIDEN1, self.HIDEN2)
                 self.clear()
                 self.multiplayer()
                 break
@@ -1084,7 +1084,7 @@ class Battleship(object):
             new_game = raw_input("    Play again? y/n ")
             new_game = new_game.lower()
             if new_game == "y" or new_game == "yes":
-                selfself.limpiar(self.USERBOARD, self.BOARDCOMP, self.VERSUSBOARD, self.PLAYER2, self.HIDEN1, self.HIDEN2)
+                self.limpiar(self.USERBOARD, self.BOARDCOMP, self.VERSUSBOARD, self.PLAYER2, self.HIDEN1, self.HIDEN2)
                 self.clear()
                 self.multiplayer_wmd()
                 break
@@ -1463,8 +1463,7 @@ class Battleship(object):
            /  _/___  _____/ /________  _______/ /_(_)___  ____  _____    
            / // __ \/ ___/ __/ ___/ / / / ___/ __/ / __ \/ __ \/ ___/    
          _/ // / / (__  ) /_/ /  / /_/ / /__/ /_/ / /_/ / / / (__  )     
-        /___/_/ /_/____/\__/_/   \__,_/\___/\__/_/\____/_/ /_/____/
-""" + chr(27) + "[0m"
+        /___/_/ /_/____/\__/_/   \__,_/\___/\__/_/\____/_/ /_/____/ """ + chr(27) + "[0m"
 
         time.sleep(0.1)
         print "      Before the battle you should place the ships on the board."
