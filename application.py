@@ -74,7 +74,7 @@ class Battleship(object):
         """This method adds several lists at the board list,
         this will serve to place the boats later."""
         for var in range(0, 10):
-            board.append(["|   "] * 10),
+            board.append(["|   "] * 10)
 
 
 
@@ -88,7 +88,7 @@ class Battleship(object):
                 print fila + 1, chr(27) + "[0;94m" + " ", "".join(elemento) + "|"
                 print "    -----------------------------------------" + chr(27) + "[0m"
             else:
-                print fila + 1,chr(27) + "[0;94m"+ "", "".join(elemento) + "|"
+                print fila + 1, chr(27) + "[0;94m"+ "", "".join(elemento) + "|"
                 print "    -----------------------------------------" + chr(27) + "[0m"
 
 
@@ -111,9 +111,13 @@ class Battleship(object):
             condicion = False
             while condicion == False: #This allows repeat the cycle every time an error is returned.
                 if boat == "aircraft": #
-                    print ">- Place an " + chr(27) + "[3;96m" + boat + chr(27) + "[0m", "it measures", chr(27) + "[3;96m"+ str(self.ships[boat]) + " squares." + chr(27) + "[0m"
+                    print ">- Place an " + chr(27) + "[3;96m" + boat + chr(27)\
+                    + "[0m", "it measures", chr(27) + "[3;96m"+ str(self.ships[boat])\
+                    + " squares." + chr(27) + "[0m"
                 else:
-                    print ">- Place a " + chr(27) + "[3;96m" + boat + chr(27) + "[0m", "it measures", chr(27) + "[3;96m"+ str(self.ships[boat]) + " squares." + chr(27) + "[0m"
+                    print ">- Place a " + chr(27) + "[3;96m" + boat + chr(27)\
+                    + "[0m", "it measures", chr(27) + "[3;96m"+ str(self.ships[boat])\
+                    + " squares." + chr(27) + "[0m"
                 placerow = self.entering_number_row()
                 if placerow == "exit":
                     break
@@ -123,16 +127,27 @@ class Battleship(object):
                 position = self.user_vertical_horizontal()
 
                 if position == "h":
-                    there_are_boat = self.no_intersection_horizontal(board, self.ships, boat, placerow, placecol) #Checks the existence of boats in horizontal position and  if they are put off the board
-                    if there_are_boat != False: #If true, it means that no ships. Otherwise the loop is repeated again.
+                    #Checks the existence of boats in horizontal
+                    #position and  if they are put off the board
+
+                    there_are_boat = self.no_intersection_horizontal(board,\
+                        self.ships, boat, placerow, placecol)
+                    if there_are_boat != False:
+                        #If true, it means that no ships. Otherwise the loop is repeated again.
+
                         self.placing_ship_horizon(board, placerow, placecol, boat) #Place the boats.
                         self.clear()
                         self.print_tablero(board)
                         condicion = True #The loop ends to spend the next boat.
                 elif position == "v":
-                    boat_in_vertical = self.no_exist_vertical(board, self.ships, boat, placerow, placecol) #Checks the existence of boats in vertical position and  if they are put off the board.
-                    if boat_in_vertical != False: #If true, it means that no ships. Otherwise the loop is repeated again.
-                        self.placing_ship_vertical(board, placerow, placecol, boat) #Place the boats.
+                    #Checks the existence of boats in vertical.
+                    boat_in_vertical = self.no_exist_vertical(board,\
+                    self.ships, boat, placerow, placecol)
+
+                    #If true, it means that no ships. Otherwise the loop is repeated again
+                    if boat_in_vertical != False:
+                        self.placing_ship_vertical(board,\
+                        placerow, placecol, boat) #Place the boats.
                         self.clear()
                         self.print_tablero(board)
                         condicion = True #The loop ends to spend the next boat.
@@ -150,7 +165,9 @@ class Battleship(object):
         except: #If an error occurs, an error message is displayed and returns False.
             self.baddata.play()
             print ""
-            print chr(27) + "[0;91m" + "    ⚠ You can not put the boat in this position. It is off the board." + chr(27) + "[0m"
+            print chr(27) + "[0;91m"\
+            + "    ⚠ You can not put the boat in this position. It is off the board."\
+            + chr(27) + "[0m"
             print ""
             return False
 
@@ -161,7 +178,7 @@ class Battleship(object):
             print ""
             print chr(27) + "[0;91m" + "    ✘ In this position already exists a boat. Try again." + chr(27) + "[0m"
             print ""
-            return False 
+            return False
 
 
 
@@ -187,7 +204,7 @@ class Battleship(object):
             print ""
             print chr(27) + "[0;91m" + "    ✘ In this position already exists a boat. Try again." + chr(27) + "[0m"
             print ""
-            return False 
+            return False
 
 
 
@@ -216,7 +233,7 @@ class Battleship(object):
         except:
             try:
                 for intento in range(self.ships[boat]):
-                    board[coordx + intento ][coordy] = "|   "
+                    board[coordx + intento][coordy] = "|   "
             except:
                 print ""
                 print chr(27) + "[0;91m" + "    ⚠ You can not put the boat in this position. It is off the board." + chr(27) + "[0m"
@@ -274,33 +291,33 @@ class Battleship(object):
 
 
     def entering_number_row(self):
-            """Allows the user to enter a row number."""
-            while True:
-                print ""
-                guessrow = raw_input("   >Enter row: ")
-                if guessrow == "exit":
-                    self.clear()
-                    self.limpiar(self.userboard, self.boardcomp, self.versusboard, self.player2, self.hiden1, self.hiden2)
-                    self.first()
-                    self.menu()
-                    return guessrow
-                    break
-                else:
-                    try:
-                        guessrow = int(guessrow)
-                        if guessrow >= 1 and guessrow <= 10:
-                            self.optionsound.play()
-                            guessrow -= 1
-                            return guessrow
-                            break
-                        else:
-                            self.soundinvalid.play()
-                            print ""
-                            print chr(27) + "[0;91m" + "     ✘ Please enter numbers in the range of 1 - 10." + chr(27) + "[0m"
-                    except:
-                        self.baddata.play()
+        """Allows the user to enter a row number."""
+        while True:
+            print ""
+            guessrow = raw_input("   >Enter row: ")
+            if guessrow == "exit":
+                self.clear()
+                self.limpiar(self.userboard, self.boardcomp, self.versusboard, self.player2, self.hiden1, self.hiden2)
+                self.first()
+                self.menu()
+                return guessrow
+                break
+            else:
+                try:
+                    guessrow = int(guessrow)
+                    if guessrow >= 1 and guessrow <= 10:
+                        self.optionsound.play()
+                        guessrow -= 1
+                        return guessrow
+                        break
+                    else:
+                        self.soundinvalid.play()
                         print ""
-                        print chr(27) + "[0;91m" + "     ✘ Please enter numbers!" + chr(27) + "[0m"
+                        print chr(27) + "[0;91m" + "     ✘ Please enter numbers in the range of 1 - 10." + chr(27) + "[0m"
+                except:
+                    self.baddata.play()
+                    print ""
+                    print chr(27) + "[0;91m" + "     ✘ Please enter numbers!" + chr(27) + "[0m"
 
 
 
@@ -438,16 +455,14 @@ class Battleship(object):
                 print "                     You win!"
                 print ""
 
-            print u"""
-          __    __    _____     ____   ________     ____     ______    __      __ 
-          ).)  (.(   (_..._)   /.___) (___..___)   /.__.\   (...__.\   ).\    /.( 
-         (.(    ).)    |.|    /./         ).)     /./..\.\   ).(__).)   \.\  /./  
-          \.\  /./     |.|   (.(         (.(     (.()..().) (....__/     \.\/./   
-           \.\/./      |.|   (.(          ).)    (.()..().)  ).\.\.._     \../    
-            \../      _|.|__  \.\___     (.(      \.\__/./  (.(.\.\_))     )(     
-             \/      /_____(   \____)    /__\      \____/    )_).\__/     /__\    
-         .........................................................................
-    """
+            print u'''
+            ____    ____  __    ______ .___________.  ______   .______     ____    ____  __  
+            \   \  /   / |  |  /      ||           | /  __  \  |   _  \    \   \  /   / |  | 
+             \   \/   /  |  | |  ,----'`---|  |----`|  |  |  | |  |_)  |    \   \/   /  |  | 
+              \      /   |  | |  |         |  |     |  |  |  | |      /      \_    _/   |  | 
+               \    /    |  | |  `----.    |  |     |  `--'  | |  |\  \----.   |  |     |__| 
+                \__/     |__|  \______|    |__|      \______/  | _| `._____|   |__|     (__)
+    '''
             return True #Returns true to end the game.
         else:
             return False #If the condition is not met, returns false and the game continues.
@@ -475,13 +490,13 @@ class Battleship(object):
                     minesweeper += 1
             count += 1
 
-        if aircraft == 0 and battleship == 0 and frigate == 0 and submarine == 0 and minesweeper == 0: 
+        if aircraft == 0 and battleship == 0 and frigate == 0 and submarine == 0 and minesweeper == 0:
             print ""
             print "                     You've been defeated" #if no any ship, means the computer has won.
             print ""
             print """
           ._______..._______.._______.._______.....___....___________.
-          |       \.|  .____||  .____||  .____|.../   \..|           |
+          |       \.|  .____||  .____||  .____|.. /   \..|           |
           |  .--.  ||  |__...|  |__...|  |__...../ .^. \.`---|  |----`
           |  |..|  ||  .__|..|  .__|..|  .__|.../  /_\  \....|  |.....
           |  '--'  ||  |____.|  |.....|  |____./  _____  \...|  |.....
@@ -1340,7 +1355,7 @@ class Battleship(object):
 
     def first(self):
         """This is a method that displays the name of the game and the menu instructions"""
-        print chr(27) + "[0;93m" + u""" 
+        print chr(27) + "[0;93m" + u"""
     ██████╗**█████╗*████████╗████████╗██╗*****███████╗███████╗██╗**██╗██╗██████╗*██╗
     ██╔══██╗██╔══██╗╚══██╔══╝╚══██╔══╝██║*****██╔════╝██╔════╝██║**██║██║██╔══██╗██║
     ██████╔╝███████║***██║******██║***██║*****█████╗**███████╗███████║██║██████╔╝██║
@@ -1435,7 +1450,7 @@ class Battleship(object):
 
     def method_exists(self, option):
         """contains the methods of different game types, and returns it to be used in the menu"""
-        dici = {"1": self.game_mode,  "2": self.game_mode_multiplayer, "3": self.instruccions_single}
+        dici = {"1": self.game_mode, "2": self.game_mode_multiplayer, "3": self.instruccions_single}
         count = 0
 
         if option == "4":
@@ -1457,7 +1472,7 @@ class Battleship(object):
         """Main menu"""
         condition = False
         while condition == False:
-            option = raw_input(   ">* Choose an option: ")
+            option = raw_input("    >* Choose an option: ")
             methods = self.method_exists(option)
             if methods != "exit":
                 methods()
