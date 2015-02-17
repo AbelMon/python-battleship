@@ -170,13 +170,15 @@ class Battleship(object):
             + chr(27) + "[0m"
             print ""
             return False
-
-        if count == dict_ship[boat]: #If the value of "boat" and the value of "count" match, returns True, it means there are no boats.
+        #If the value of "boat" and the value of "count" match,
+        #returns True, it means there are no boats.
+        if count == dict_ship[boat]:
             return True
         else: #If the values are different, returns False.
             self.soundinvalid.play()
             print ""
-            print chr(27) + "[0;91m" + "    ✘ In this position already exists a boat. Try again." + chr(27) + "[0m"
+            print chr(27) + "[0;91m"\
+            + "    ✘ In this position already exists a boat. Try again." + chr(27) + "[0m"
             print ""
             return False
 
@@ -193,16 +195,21 @@ class Battleship(object):
         except: #If an error occurs, an error message is displayed and returns False.
             self.baddata.play()
             print ""
-            print chr(27) + "[0;91m" + "    ⚠ You can not put the boat in this position. It is off the board." + chr(27) + "[0m"
+            print chr(27)\
+            + "[0;91m" + "    ⚠ You can not put the boat in this position. It is off the board."\
+            + chr(27) + "[0m"
             print ""
             return False
-
-        if count == dict_ship[boat]: #If the value of "boat" and the value of "count" match, returns True, it means there are no boats.
+            #If the value of "boat" and the value of "count" match,
+            #returns True, it means there are no boats.
+        if count == dict_ship[boat]:
             return True
         else: #If the values are different, returns False.
             self.soundinvalid.play()
             print ""
-            print chr(27) + "[0;91m" + "    ✘ In this position already exists a boat. Try again." + chr(27) + "[0m"
+            print chr(27)\
+            + "[0;91m" + "    ✘ In this position already exists a boat. Try again."\
+            + chr(27) + "[0m"
             print ""
             return False
 
@@ -236,7 +243,9 @@ class Battleship(object):
                     board[coordx + intento][coordy] = "|   "
             except:
                 print ""
-                print chr(27) + "[0;91m" + "    ⚠ You can not put the boat in this position. It is off the board." + chr(27) + "[0m"
+                print chr(27) + "[0;91m"\
+                + "    ⚠ You can not put the boat in this position. It is off the board."\
+                + chr(27) + "[0m"
                 print ""
                 return False
 
@@ -255,10 +264,14 @@ class Battleship(object):
             decisionuser = raw_input("   >* v/h: ")
             decision_low = decisionuser.lower()
             if decision_low == "h":
-                return "h" #If the user chooses horizontal, returns h, and another method is responsible for placing the ship.
+                #If the user chooses horizontal, returns h,
+                #and another method is responsible for placing the ship.
+                return "h"
                 break
             elif decision_low == "v":
-                return "v" #If the user chooses vertical, returns v, and another method is responsible for placing the ship.
+                #If the user chooses vertical, returns v,
+                #and another method is responsible for placing the ship.
+                return "v"
                 break
             else:
                 self.baddata.play()
